@@ -1,0 +1,35 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1",
+	"FriendlyName": "Emergence VRM Support",
+	"Description": "",
+	"Category": "Metaverse",
+	"CreatedBy": "Crucible",
+	"CreatedByURL": "https://crucible.network/",
+	"DocsURL": "https://docs.openmetadao.com/",
+	"MarketplaceURL": "",
+	"SupportURL": "https://discord.gg/openmeta",
+	"EnabledByDefault": false,
+	"CanContainContent": false,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "EmergenceVRMSupport",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "Emergence",
+			"Enabled": true
+		},
+		{
+			"Name": "VRM4U",
+			"Enabled": true
+		}
+	]
+}
