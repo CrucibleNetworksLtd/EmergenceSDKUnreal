@@ -17,7 +17,7 @@ UEmergenceVRMMeshComponent::UEmergenceVRMMeshComponent()
 	VRoidSimpleAssetList = VRoidSimpleAssetListBP.Object;
 }
 
-void UEmergenceVRMMeshComponent::ActivateVRMMeshFromData(TArray<uint8> Data) {
+void UEmergenceVRMMeshComponent::ActivateVRMMeshFromData(const TArray<uint8>& Data) {
 	USkeletalMeshComponent* ParentSkeletalMesh = Cast<USkeletalMeshComponent>(GetAttachParent());
 	if (!ParentSkeletalMesh) {
 		UE_LOG(LogTemp, Error, TEXT("Attach Parent of a EmergenceVRMMeshComponent must be a SkeletalMesh"));
@@ -34,6 +34,11 @@ void UEmergenceVRMMeshComponent::ActivateVRMMeshFromData(TArray<uint8> Data) {
 		return;
 	}
 
+	if (Data.Num() < 1) {
+		UE_LOG(LogTemp, Error, TEXT("No data was provided to ActivateVRMMeshFromData"));
+		return;
+	}
+
 	UVrmAssetListObject* VrmAssetListObject = NewObject<UVrmAssetListObject>(this, VrmAssetListObjectBPClass);
 
 	FImportOptionData OptionForRuntimeLoad;
@@ -42,6 +47,11 @@ void UEmergenceVRMMeshComponent::ActivateVRMMeshFromData(TArray<uint8> Data) {
 
 	ParentSkeletalMesh->SetSkeletalMesh(OutVrmAsset->SkeletalMesh, true);
 	ParentSkeletalMesh->SetAnimClass(UVrmAnimInstanceCopy::StaticClass());
-
-	Cast<UVrmAnimInstanceCopy>(ParentSkeletalMesh->GetAnimInstance())->SetSkeletalMeshCopyData(OutVrmAsset, this, nullptr, VRoidSimpleAssetList, nullptr);
+	if (ParentSkeletalMesh->GetAnimInstance()) {
+		Cast<UVrmAnimInstanceCopy>(ParentSkeletalMesh->GetAnimInstance())->SetSkeletalMeshCopyData(OutVrmAsset, this, nullptr, VRoidSimpleAssetList, nullptr);
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Couldn't GetAnimInstance, the VRM probably failed to load"));
+		return;
+	}
 }

@@ -17,7 +17,8 @@ UENUM(BlueprintType)
 enum class EEmergenceEthereumChain : uint8
 {
 	MainnetInfura UMETA(DisplayName = "mainnet.infura.io (Crucible's key)"),
-	RinkebyInfura UMETA(DisplayName = "rinkeby.infura.io (Crucible's key)")
+	RinkebyInfura UMETA(DisplayName = "rinkeby.infura.io (Crucible's key)"),
+	GoerliInfura UMETA(DisplayName = "goerli.infura.io (Crucible's key)")
 };
 
 UENUM(BlueprintType)
@@ -91,6 +92,10 @@ USTRUCT() struct FEmergenceChainStruct
 			EthereumChain = EEmergenceEthereumChain::RinkebyInfura;
 		}
 
+		if (EthereumChainName == TEXT("GoerliInfura")) {
+			EthereumChain = EEmergenceEthereumChain::GoerliInfura;
+		}
+
 		if (PolygonChainName == TEXT("MainnetInfura")) {
 			PolygonChain = EEmergencePolygonChain::MainnetInfura;
 		}
@@ -121,6 +126,8 @@ USTRUCT() struct FEmergenceChainStruct
 					return "https://mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134";
 				case EEmergenceEthereumChain::RinkebyInfura:
 					return "https://rinkeby.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134";
+				case EEmergenceEthereumChain::GoerliInfura:
+					return "https://goerli.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134";
 				}
 				break;
 			}
