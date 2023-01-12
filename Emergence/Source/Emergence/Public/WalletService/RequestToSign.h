@@ -22,7 +22,7 @@ public:
 	 * @param MessageToSign The message that they will be presented to sign.
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence|WalletConnect Requests")
-	static URequestToSign* RequestToSign(const UObject* WorldContextObject, const FString& MessageToSign);
+	static URequestToSign* RequestToSign(UObject* WorldContextObject, const FString& MessageToSign);
 
 	virtual void Activate() override;
 
@@ -32,6 +32,6 @@ public:
 	FOnRequestToSignCompleted OnRequestToSignCompleted;
 private:
 	void RequestToSign_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 	FString MessageToSign;
 };

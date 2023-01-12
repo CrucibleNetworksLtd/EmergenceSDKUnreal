@@ -16,8 +16,10 @@ public class EmergenceEditor : ModuleRules
 				"RHI",
 				"Slate",
 				"SlateCore",
-				"EditorStyle"
-            }
+				"EditorStyle",
+				"UnrealEd",
+				"Projects"
+			}
 		);
 
 		PublicDependencyModuleNames.AddRange(

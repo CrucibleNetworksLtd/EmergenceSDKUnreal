@@ -52,6 +52,9 @@ public:
 	FOnCachedPersonaUpdated OnCachedPersonaUpdated;
 
 	UPROPERTY()
+	TArray<FString> ContractsWithLoadedABIs;
+
+	UPROPERTY()
 	TMap<FString, UTexture2D*> DownloadedImageCache;
 
 	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|Overlay Methods")
@@ -108,10 +111,6 @@ private:
 
 	UEmergenceUI* CurrentEmergenceUI;
 public:
-	//Gets the token symbol set in the project settings.
-	UFUNCTION(BlueprintPure)
-	FString GetTokenSymbol();
-
 	//Cancels any open GetAccessToken and GetHandshake requests.
 	UFUNCTION(BlueprintCallable)
 	void CancelSignInRequest();
@@ -122,7 +121,7 @@ public:
 
 	//Opens the Emergence UI, returns the widget to focus
 	UFUNCTION(BlueprintCallable)
-	UWidget* OpenEmergenceUI(APlayerController* OwnerPlayerController, TSubclassOf<UEmergenceUI> EmergenceUIClass);
+	UEmergenceUI* OpenEmergenceUI(APlayerController* OwnerPlayerController, TSubclassOf<UEmergenceUI> EmergenceUIClass);
 
 	//Gets the Emergence UI
 	UFUNCTION(BlueprintPure)
@@ -212,8 +211,14 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence Requests")
 	FOnGetAccessTokenCompleted OnGetAccessTokenCompleted;
 
+	UFUNCTION()
+	void OnOverlayClosed();
+
 private:
 	static TMap<TWeakObjectPtr<UGameInstance>, TWeakObjectPtr<UEmergenceSingleton>> GlobalManagers;
 	TWeakObjectPtr<UGameInstance> OwningGameInstance;
+
+	bool PreviousMouseShowState;
+	int PreviousGameInputMode;
 };
 #pragma warning( pop )

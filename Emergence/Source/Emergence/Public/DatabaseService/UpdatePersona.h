@@ -19,7 +19,7 @@ class EMERGENCE_API UUpdatePersona : public UBlueprintAsyncActionBase
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence Internal|Persona Methods")
-	static UUpdatePersona* UpdatePersona(const UObject* WorldContextObject, FEmergencePersona Persona);
+	static UUpdatePersona* UpdatePersona(UObject* WorldContextObject, FEmergencePersona Persona);
 
 	virtual void Activate() override;
 
@@ -29,6 +29,6 @@ public:
 	FOnUpdatePersonaCompleted OnUpdatePersonaCompleted;
 private:
 	void UpdatePersona_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 	FEmergencePersona Persona;
 };

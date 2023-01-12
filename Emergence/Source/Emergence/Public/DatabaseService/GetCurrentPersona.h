@@ -19,7 +19,7 @@ class EMERGENCE_API UGetCurrentPersona : public UBlueprintAsyncActionBase
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence Internal|Persona Methods")
-	static UGetCurrentPersona* GetCurrentPersona(const UObject* WorldContextObject);
+	static UGetCurrentPersona* GetCurrentPersona(UObject* WorldContextObject);
 
 	virtual void Activate() override;
 
@@ -29,5 +29,5 @@ public:
 	FOnGetCurrentPersonaCompleted OnGetCurrentPersonaCompleted;
 private:
 	void GetCurrentPersona_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 };

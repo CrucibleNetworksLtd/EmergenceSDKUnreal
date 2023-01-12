@@ -7,10 +7,11 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-UGetPersonas* UGetPersonas::GetPersonas(const UObject* WorldContextObject)
+UGetPersonas* UGetPersonas::GetPersonas(UObject* WorldContextObject)
 {
 	UGetPersonas* BlueprintNode = NewObject<UGetPersonas>();
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -43,9 +44,10 @@ void UGetPersonas::GetPersonas_HttpRequestComplete(FHttpRequestPtr HttpRequest, 
 				UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->SetCachedCurrentPersona(ResponceStruct.personas[i]);
 			}
 		}
-
-		return;
 	}
-	OnGetPersonasCompleted.Broadcast(FEmergencePersonaListResponse(), StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("GetPersonas", StatusCode);
+	else {
+		OnGetPersonasCompleted.Broadcast(FEmergencePersonaListResponse(), StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("GetPersonas", StatusCode);
+	}
+	SetReadyToDestroy();
 }

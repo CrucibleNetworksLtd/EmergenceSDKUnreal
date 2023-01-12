@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.2.2",
+	"VersionName": "0.3.0",
 	"FriendlyName": "Emergence",
 	"Description": "",
 	"Category": "Metaverse",
@@ -22,6 +22,11 @@
 		},
 		{
 			"Name": "EmergenceEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "EmergenceEditorMethodGraphPin",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}

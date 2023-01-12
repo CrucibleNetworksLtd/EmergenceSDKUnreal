@@ -22,7 +22,7 @@ public:
 	 * @param AccessToken The access token to authenticate.
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence|Signed Message Validation")
-	static UValidateAccessToken* ValidateAccessToken(const UObject* WorldContextObject, const FString& AccessToken);
+	static UValidateAccessToken* ValidateAccessToken(UObject* WorldContextObject, const FString& AccessToken);
 
 	virtual void Activate() override;
 
@@ -32,6 +32,6 @@ public:
 	FOnValidateAccessTokenCompleted OnValidateAccessTokenCompleted;
 private:
 	void ValidateAccessToken_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 	FString AccessToken;
 };

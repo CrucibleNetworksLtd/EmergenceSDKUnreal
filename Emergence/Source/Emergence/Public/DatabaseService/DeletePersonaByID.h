@@ -19,7 +19,7 @@ class EMERGENCE_API UDeletePersonaByID : public UBlueprintAsyncActionBase
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence Internal|Persona Methods")
-	static UDeletePersonaByID* DeletePersonaByID(const UObject* WorldContextObject, const FString& PersonaID);
+	static UDeletePersonaByID* DeletePersonaByID(UObject* WorldContextObject, const FString& PersonaID);
 
 	virtual void Activate() override;
 
@@ -29,6 +29,6 @@ public:
 	FOnDeletePersonaByIDCompleted OnDeletePersonaByIDCompleted;
 private:
 	void DeletePersonaByID_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 	FString PersonaID;
 };

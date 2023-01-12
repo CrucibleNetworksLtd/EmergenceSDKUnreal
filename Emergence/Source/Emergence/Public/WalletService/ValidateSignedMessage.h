@@ -24,7 +24,7 @@ public:
 	 * @param Address The address that signed the message.
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence|Signed Message Validation")
-	static UValidateSignedMessage* ValidateSignedMessage(const UObject* WorldContextObject, const FString& Message, const FString& SignedMessage, const FString& Address);
+	static UValidateSignedMessage* ValidateSignedMessage(UObject* WorldContextObject, const FString& Message, const FString& SignedMessage, const FString& Address);
 
 	virtual void Activate() override;
 
@@ -34,6 +34,6 @@ public:
 	FOnValidateSignedMessageCompleted OnValidateSignedMessageCompleted;
 private:
 	void ValidateSignedMessage_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 	FString Address, Message, SignedMessage;
 };

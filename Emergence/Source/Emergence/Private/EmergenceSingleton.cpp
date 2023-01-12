@@ -15,11 +15,10 @@
 #include "IImageWrapper.h"
 #include "Dom/JsonObject.h"
 
-#include "Windows/WindowsSystemIncludes.h"
 #include "HttpService/HttpHelperLibrary.h"
 #include "Containers/UnrealString.h"
 
-#include "EmergenceChain.h"
+#include "EmergenceChainObject.h"
 
 UEmergenceSingleton::UEmergenceSingleton() {
 }
@@ -28,6 +27,10 @@ TMap<TWeakObjectPtr<UGameInstance>, TWeakObjectPtr<UEmergenceSingleton>> UEmerge
 
 UEmergenceSingleton* UEmergenceSingleton::GetEmergenceManager(const UObject* ContextObject)
 {
+	if (!GEngine || !ContextObject) {
+		return nullptr;
+	}
+
 	UWorld* World = GEngine->GetWorldFromContextObject(ContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	UGameInstance* GameInstance = World ? World->GetGameInstance() : nullptr;
 	if (GameInstance)
@@ -114,11 +117,6 @@ void UEmergenceSingleton::GetWalletConnectURI_HttpRequestComplete(FHttpRequestPt
 	OnAnyRequestError.Broadcast("GetWalletConnectURI", UErrorCodeFunctionLibrary::GetResponseErrors(HttpResponse, bSucceeded));
 }
 
-FString UEmergenceSingleton::GetTokenSymbol()
-{
-	return UChainDataLibrary::GetEmergenceChainDataFromConfig().GetChainSymbol();;
-}
-
 void UEmergenceSingleton::CancelSignInRequest()
 {
 	if (GetAccessTokenRequest && GetAccessTokenRequest->GetStatus() == EHttpRequestStatus::Processing) {
@@ -141,11 +139,40 @@ FString UEmergenceSingleton::GetCurrentAccessToken()
 	}
 }
 
-UWidget* UEmergenceSingleton::OpenEmergenceUI(APlayerController* OwnerPlayerController, TSubclassOf<UEmergenceUI> EmergenceUIClass)
+UEmergenceUI* UEmergenceSingleton::OpenEmergenceUI(APlayerController* OwnerPlayerController, TSubclassOf<UEmergenceUI> EmergenceUIClass)
 {
 	if (EmergenceUIClass) {
 		CurrentEmergenceUI = CreateWidget<UEmergenceUI>(OwnerPlayerController, EmergenceUIClass);
 		CurrentEmergenceUI->AddToViewport(9999);
+
+		//Get the current state of showing the mouse so we can set it back to this later
+		this->PreviousMouseShowState = OwnerPlayerController->bShowMouseCursor;
+		//Get the current state of input mode so we can set it back to this later
+		UGameViewportClient* GameViewportClient = OwnerPlayerController->GetWorld()->GetGameViewport();
+		bool IgnoringInput = GameViewportClient->IgnoreInput();
+		EMouseCaptureMode CaptureMouse = GameViewportClient->GetMouseCaptureMode();
+
+		if (IgnoringInput == false && CaptureMouse == EMouseCaptureMode::CaptureDuringMouseDown) //Game And UI
+		{
+			this->PreviousGameInputMode = 0;
+		}
+		else if (IgnoringInput == true && CaptureMouse == EMouseCaptureMode::NoCapture) //UI Only
+		{
+			this->PreviousGameInputMode = 1;
+		}
+		else //Game Only
+		{
+			this->PreviousGameInputMode = 2;
+		}
+
+		OwnerPlayerController->SetShowMouseCursor(true);
+		FInputModeUIOnly InputMode = FInputModeUIOnly();
+		InputMode.SetWidgetToFocus(CurrentEmergenceUI->GetCachedWidget());
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		OwnerPlayerController->SetInputMode(InputMode);
+
+		CurrentEmergenceUI->Closed.AddDynamic(this, &UEmergenceSingleton::OnOverlayClosed);
+
 		if (CurrentEmergenceUI) {
 			return CurrentEmergenceUI;
 		}
@@ -280,10 +307,10 @@ void UEmergenceSingleton::GetHandshake_HttpRequestComplete(FHttpRequestPtr HttpR
 
 void UEmergenceSingleton::GetHandshake()
 {
-	FEmergenceChainStruct ChainData = UChainDataLibrary::GetEmergenceChainDataFromConfig();
-	FString NodeURL = ChainData.GetChainURL();
+	auto ChainData = UEmergenceChain::GetEmergenceChainDataFromConfig(this);
+	FString NodeURL = ChainData->NodeURL;
 #if WITH_EDITOR
-	UE_LOG(LogEmergenceHttp, Display, TEXT("Using chain %s, node URL: %s"), *UEnum::GetDisplayValueAsText(ChainData.Chain).ToString(), *NodeURL);
+	UE_LOG(LogEmergenceHttp, Display, TEXT("Using chain %s, node URL: %s"), *ChainData->Name.ToString(), *NodeURL);
 #endif
 	
 	GetHandshakeRequest = UHttpHelperLibrary::ExecuteHttpRequest<UEmergenceSingleton>(
@@ -365,12 +392,28 @@ void UEmergenceSingleton::KillSession()
 	UE_LOG(LogEmergenceHttp, Display, TEXT("KillSession request started, calling KillSession_HttpRequestComplete on request completed"));
 }
 
+void UEmergenceSingleton::OnOverlayClosed()
+{
+	auto OpeningPlayerController = CurrentEmergenceUI->GetPlayerContext().GetPlayerController();
+	OpeningPlayerController->SetShowMouseCursor(this->PreviousMouseShowState);
+	switch (this->PreviousGameInputMode) {
+	case 0:
+		OpeningPlayerController->SetInputMode(FInputModeGameAndUI());
+		break;
+	case 1:
+		OpeningPlayerController->SetInputMode(FInputModeUIOnly());
+		break;
+	case 2:
+		OpeningPlayerController->SetInputMode(FInputModeGameOnly());
+		break;
+	}
+	CurrentEmergenceUI->Closed.RemoveDynamic(this, &UEmergenceSingleton::OnOverlayClosed);
+}
+
 void UEmergenceSingleton::GetAccessToken_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
 {
-	EErrorCode StatusCode;
-	UE_LOG(LogEmergenceHttp, Display, TEXT("Parsing %s"), *HttpResponse->GetContentAsString());
-	FJsonObject JsonObject = UErrorCodeFunctionLibrary::TryParseResponseAsJson(HttpResponse, bSucceeded, StatusCode);
-	UE_LOG(LogEmergenceHttp, Display, TEXT("Access token callback was error code: %s"), *StaticEnum<EErrorCode>()->GetValueAsString(StatusCode));
+	EErrorCode StatusCode;	
+	FJsonObject JsonObject = UErrorCodeFunctionLibrary::TryParseResponseAsJson(HttpResponse, bSucceeded, StatusCode);	
 	if (StatusCode == EErrorCode::EmergenceOk) {
 		FString OutputString;
 		TSharedRef< TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>> > Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
@@ -382,6 +425,10 @@ void UEmergenceSingleton::GetAccessToken_HttpRequestComplete(FHttpRequestPtr Htt
 		UE_LOG(LogEmergenceHttp, Display, TEXT("Got access token! It is: %s"), *this->CurrentAccessToken);
 		OnGetAccessTokenCompleted.Broadcast(StatusCode);
 		return;
+	}
+	else {
+		UE_LOG(LogEmergenceHttp, Display, TEXT("Access token callback error parsing %s"), *HttpResponse->GetContentAsString());
+		UE_LOG(LogEmergenceHttp, Display, TEXT("Access token callback was error code: %s"), *StaticEnum<EErrorCode>()->GetValueAsString(StatusCode));
 	}
 	OnGetAccessTokenCompleted.Broadcast(StatusCode);
 	OnAnyRequestError.Broadcast("GetAccessToken", StatusCode);

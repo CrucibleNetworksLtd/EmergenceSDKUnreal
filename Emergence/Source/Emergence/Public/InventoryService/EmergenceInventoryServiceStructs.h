@@ -3,9 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
-#include "HttpModule.h"
-#include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
 #include "EmergenceInventoryServiceStructs.generated.h"

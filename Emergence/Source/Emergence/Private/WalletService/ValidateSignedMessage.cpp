@@ -7,13 +7,14 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-UValidateSignedMessage* UValidateSignedMessage::ValidateSignedMessage(const UObject* WorldContextObject, const FString& Message, const FString& SignedMessage, const FString& Address)
+UValidateSignedMessage* UValidateSignedMessage::ValidateSignedMessage(UObject* WorldContextObject, const FString& Message, const FString& SignedMessage, const FString& Address)
 {
 	UValidateSignedMessage* BlueprintNode = NewObject<UValidateSignedMessage>();
 	BlueprintNode->Message = Message;
 	BlueprintNode->SignedMessage = SignedMessage;
 	BlueprintNode->Address = Address;
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -51,8 +52,10 @@ void UValidateSignedMessage::ValidateSignedMessage_HttpRequestComplete(FHttpRequ
 			OnValidateSignedMessageCompleted.Broadcast(isValidToken, StatusCode);
 			UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("ValidateSignedMessage", StatusCode);
 		}
-		return;
 	}
-	OnValidateSignedMessageCompleted.Broadcast(isValidToken, StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("ValidateSignedMessage", StatusCode);
+	else {
+		OnValidateSignedMessageCompleted.Broadcast(isValidToken, StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("ValidateSignedMessage", StatusCode);
+	}
+	SetReadyToDestroy();
 }

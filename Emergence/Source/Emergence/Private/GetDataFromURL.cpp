@@ -1,7 +1,7 @@
 // Copyright Crucible Networks Ltd 2022. All Rights Reserved.
 
 
-#include "GetDataFromUrl.h"
+#include "GetDataFromURL.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "HttpService/HttpHelperLibrary.h"
@@ -20,9 +20,9 @@ void UGetDataFromUrl::GetDataFromUrl_HttpRequestComplete(FHttpRequestPtr HttpReq
 {
 	EErrorCode ResponseCode = UErrorCodeFunctionLibrary::GetResponseErrors(HttpResponse, bSucceeded);
 	if (!EHttpResponseCodes::IsOk(UErrorCodeFunctionLibrary::Conv_ErrorCodeToInt(ResponseCode))) {
-		OnGetDataFromUrlCompleted.Broadcast(TArray<uint8>(), ResponseCode, false);
+		OnGetDataFromUrlCompleted.Broadcast(TArray<uint8>(), FString(), ResponseCode, false);
 		return;
 	}
 	
-	OnGetDataFromUrlCompleted.Broadcast(HttpResponse->GetContent(), ResponseCode, true);
+	OnGetDataFromUrlCompleted.Broadcast(HttpResponse->GetContent(), HttpResponse->GetContentAsString(), ResponseCode, true);
 }

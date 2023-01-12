@@ -7,7 +7,7 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-UWriteDynamicMetadata* UWriteDynamicMetadata::WriteDynamicMetadata(const UObject* WorldContextObject, const FString& Network, const FString& AuthorizationHeader, const FString& Contract, const FString& TokenID, const FString& Metadata/*, const bool OnlyUpdate*/)
+UWriteDynamicMetadata* UWriteDynamicMetadata::WriteDynamicMetadata(UObject* WorldContextObject, const FString& Network, const FString& AuthorizationHeader, const FString& Contract, const FString& TokenID, const FString& Metadata/*, const bool OnlyUpdate*/)
 {
 	UWriteDynamicMetadata* BlueprintNode = NewObject<UWriteDynamicMetadata>();
 	BlueprintNode->AuthorizationHeader = AuthorizationHeader;
@@ -17,6 +17,7 @@ UWriteDynamicMetadata* UWriteDynamicMetadata::WriteDynamicMetadata(const UObject
 	BlueprintNode->Metadata = Metadata;
 	BlueprintNode->OnlyUpdate = true/*OnlyUpdate*/;
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -37,7 +38,7 @@ void UWriteDynamicMetadata::Activate()
 		Method,
 		60.0F,
 		Headers, 
-		"{\"metadata\": \"" + Metadata + "\"}"
+		"{\"metadata\": " + Metadata + "}"
 		);
 	UE_LOG(LogEmergenceHttp, Display, TEXT("WriteDynamicMetadata request started, calling WriteDynamicMetadata_HttpRequestComplete on request completed"));
 }
@@ -48,9 +49,10 @@ void UWriteDynamicMetadata::WriteDynamicMetadata_HttpRequestComplete(FHttpReques
 	FJsonObject JsonObject = UErrorCodeFunctionLibrary::TryParseResponseAsJson(HttpResponse, bSucceeded, StatusCode);
 	if (StatusCode == EErrorCode::EmergenceOk) {
 		OnWriteDynamicMetadataCompleted.Broadcast(JsonObject.GetStringField("message"), EErrorCode::EmergenceOk);
-		return;
 	}
-
-	OnWriteDynamicMetadataCompleted.Broadcast(FString(), StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("WriteDynamicMetadata", StatusCode);
+	else {
+		OnWriteDynamicMetadataCompleted.Broadcast(FString(), StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("WriteDynamicMetadata", StatusCode);
+	}
+	SetReadyToDestroy();
 }

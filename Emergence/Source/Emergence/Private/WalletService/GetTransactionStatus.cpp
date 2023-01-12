@@ -6,27 +6,31 @@
 #include "Interfaces/IHttpResponse.h"
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
-#include "EmergenceChain.h"
+#include "EmergenceChainObject.h"
 
-UGetTransactionStatus* UGetTransactionStatus::GetTransactionStatus(const UObject* WorldContextObject, FString TransactionHash, FString NodeURL)
+UGetTransactionStatus* UGetTransactionStatus::GetTransactionStatus(UObject* WorldContextObject, FString TransactionHash, UEmergenceChain* Blockchain)
 {
 	UGetTransactionStatus* BlueprintNode = NewObject<UGetTransactionStatus>();
 	BlueprintNode->WorldContextObject = WorldContextObject;
 	BlueprintNode->TransactionHash = TransactionHash;
-	BlueprintNode->NodeURL = NodeURL;
+	BlueprintNode->Blockchain = Blockchain;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
 void UGetTransactionStatus::Activate()
 {
-	if (NodeURL.IsEmpty()) {
-		NodeURL = UChainDataLibrary::GetEmergenceChainDataFromConfig().GetChainURL();
+	if (Blockchain) {
+		UHttpHelperLibrary::ExecuteHttpRequest<UGetTransactionStatus>(
+			this,
+			&UGetTransactionStatus::GetTransactionStatus_HttpRequestComplete,
+			UHttpHelperLibrary::APIBase + "GetTransactionStatus?transactionHash=" + TransactionHash + "&nodeURL=" + Blockchain->NodeURL);
+		UE_LOG(LogEmergenceHttp, Display, TEXT("GetTransactionStatus request started with JSON, calling GetTransactionStatus_HttpRequestComplete on request completed."));
 	}
-	UHttpHelperLibrary::ExecuteHttpRequest<UGetTransactionStatus>(
-		this, 
-		&UGetTransactionStatus::GetTransactionStatus_HttpRequestComplete, 
-		UHttpHelperLibrary::APIBase + "GetTransactionStatus?transactionHash=" + TransactionHash + "&nodeURL=" + NodeURL);
-	UE_LOG(LogEmergenceHttp, Display, TEXT("GetTransactionStatus request started with JSON, calling GetTransactionStatus_HttpRequestComplete on request completed."));
+	else {
+		UE_LOG(LogEmergenceHttp, Error, TEXT("GetTransactionStatus' blockchain input was null."));
+		OnGetTransactionStatusCompleted.Broadcast(FEmergenceTransaction(), EErrorCode::EmergenceClientFailed);
+	}
 }
 
 void UGetTransactionStatus::GetTransactionStatus_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
@@ -37,10 +41,17 @@ void UGetTransactionStatus::GetTransactionStatus_HttpRequestComplete(FHttpReques
 	if (StatusCode == EErrorCode::EmergenceOk) {	
 		FString TransactionAsJSONString;
 		TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&TransactionAsJSONString);
-		FJsonSerializer::Serialize(JsonObject.GetObjectField("message")->GetObjectField("transaction").ToSharedRef(), Writer);
-		OnGetTransactionStatusCompleted.Broadcast(FEmergenceTransaction(TransactionAsJSONString), EErrorCode::EmergenceOk);
-		return;
+		if (!JsonObject.HasField("message") || JsonObject.GetObjectField("message")->HasTypedField<EJson::Null>("transaction")) {
+			OnGetTransactionStatusCompleted.Broadcast(FEmergenceTransaction(), EErrorCode::EmergenceClientJsonParseFailed);
+		}
+		else {
+			FJsonSerializer::Serialize(JsonObject.GetObjectField("message")->GetObjectField("transaction").ToSharedRef(), Writer);
+			OnGetTransactionStatusCompleted.Broadcast(FEmergenceTransaction(TransactionAsJSONString), EErrorCode::EmergenceOk);
+		}
 	}
-	OnGetTransactionStatusCompleted.Broadcast(FEmergenceTransaction(), StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("GetTransactionStatus", StatusCode);
+	else {
+		OnGetTransactionStatusCompleted.Broadcast(FEmergenceTransaction(), StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("GetTransactionStatus", StatusCode);
+	}
+	SetReadyToDestroy();
 }

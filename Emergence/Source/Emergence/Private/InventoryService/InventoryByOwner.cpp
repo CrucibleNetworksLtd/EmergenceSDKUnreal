@@ -7,12 +7,13 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-UInventoryByOwner* UInventoryByOwner::InventoryByOwner(const UObject* WorldContextObject, const FString& Address, const FString& Network)
+UInventoryByOwner* UInventoryByOwner::InventoryByOwner(UObject* WorldContextObject, const FString& Address, const FString& Network)
 {
 	UInventoryByOwner* BlueprintNode = NewObject<UInventoryByOwner>();
 	BlueprintNode->Address = FString(Address);
 	BlueprintNode->Network = FString(Network);
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -45,9 +46,10 @@ void UInventoryByOwner::InventoryByOwner_HttpRequestComplete(FHttpRequestPtr Htt
 			&Inventory,
 			0, 0);
 		OnInventoryByOwnerCompleted.Broadcast(Inventory, EErrorCode::EmergenceOk);
-		return;
 	}
-
-	OnInventoryByOwnerCompleted.Broadcast(FEmergenceInventory(), StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("InventoryByOwner", StatusCode);
+	else {
+		OnInventoryByOwnerCompleted.Broadcast(FEmergenceInventory(), StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("InventoryByOwner", StatusCode);
+	}
+	SetReadyToDestroy();
 }

@@ -6,6 +6,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
+#include "Misc/EngineVersion.h"
+#include "Interfaces/IPluginManager.h"
 #include "HttpHelperLibrary.generated.h"
 
 /**
@@ -15,9 +17,29 @@ UCLASS()
 class EMERGENCE_API UHttpHelperLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
+
 public:
 	inline static FString APIBase;
+
+	inline static FString EmergenceVersionNumberCache;
+
+	inline static FString GetEmergenceVersionNumber() {
+		if (UHttpHelperLibrary::EmergenceVersionNumberCache.IsEmpty()) { //if the cache is empty
+			IPluginManager& PluginManager = IPluginManager::Get();
+			TArray<TSharedRef<IPlugin>> Plugins = PluginManager.GetDiscoveredPlugins();
+			for (const TSharedRef<IPlugin>& Plugin : Plugins) {
+				if (Plugin->GetName() == "Emergence") {
+					const FPluginDescriptor& Descriptor = Plugin->GetDescriptor();
+					UHttpHelperLibrary::EmergenceVersionNumberCache = Descriptor.VersionName;
+					return UHttpHelperLibrary::EmergenceVersionNumberCache;
+				}
+			}
+			return "error";
+		}
+		else { //if we have it already
+			return UHttpHelperLibrary::EmergenceVersionNumberCache;
+		}
+	}
 
 	inline static FString GetInventoryServiceAPIURL() {
 		return "https://" + GetInventoryServiceHostURL() + "/InventoryService/";
@@ -147,7 +169,6 @@ public:
 
 		//switch IPFS to our public node...
 		FinalURL = UHttpHelperLibrary::InternalIPFSURLToHTTP(URL);
-
 		HttpRequest->SetURL(FinalURL);
 		HttpRequest->SetVerb(Verb);
 		HttpRequest->SetTimeout(Timeout);
@@ -155,12 +176,15 @@ public:
 		//Handle headers and logging of the headers
 		FString HeaderLogText;
 		if (Headers.Num() > 0) {
-			HeaderLogText = "\nHeaders:\n";
+			HeaderLogText = "\nAdditional headers:\n";
 			for (int i = 0; i < Headers.Num(); i++) {
 				HttpRequest->SetHeader(Headers[i].Key, Headers[i].Value);
 				HeaderLogText.Append(Headers[i].Key + ": " + Headers[i].Value + "\n");
 			}
 		}
+
+		FString Version = FEngineVersion::Current().ToString() + " Emergence " + GetEmergenceVersionNumber();
+		HttpRequest->SetHeader("User-Agent", Version);
 
 		if (Content.Len() > 0 && HttpRequest->GetHeader("Content-Type").Len() > 0) {
 			HttpRequest->SetContentAsString(Content);

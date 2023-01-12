@@ -6,7 +6,7 @@
 #include "InventoryService/InventoryScreen.h"
 #include "Blueprint/UserWidget.h"
 
-UOpenNFTPicker* UOpenNFTPicker::OpenNFTPicker(const UObject* WorldContextObject, APlayerController* PlayerController, const FEmergenceInventoryFilterSet& Filters, const FString OverrideAddress)
+UOpenNFTPicker* UOpenNFTPicker::OpenNFTPicker(UObject* WorldContextObject, APlayerController* PlayerController, const FEmergenceInventoryFilterSet& Filters, const FString OverrideAddress)
 {
 	UOpenNFTPicker* BlueprintNode = NewObject<UOpenNFTPicker>();
 	BlueprintNode->Filters = Filters;
@@ -32,8 +32,6 @@ void UOpenNFTPicker::Activate()
 
 	static TSubclassOf<UEmergenceUI> EmergenceUIBPClass = StaticLoadClass(UObject::StaticClass(), OpeningPlayerController, TEXT("/Emergence/EmergenceUI_BP.EmergenceUI_BP_C"));
 	check(EmergenceUIBPClass);
-	EmergenceUI = Cast<UEmergenceUI>(Emergence->OpenEmergenceUI(OpeningPlayerController, EmergenceUIBPClass));
-	EmergenceUI->OpeningFinished.AddDynamic(this, &UOpenNFTPicker::EmergenceOverlayReady);
 
 	//Get the current state of showing the mouse so we can set it back to this later
 	this->PreviousMouseShowState = OpeningPlayerController->bShowMouseCursor;
@@ -45,17 +43,20 @@ void UOpenNFTPicker::Activate()
 
 	if (IgnoringInput == false && CaptureMouse == EMouseCaptureMode::CaptureDuringMouseDown) //Game And UI
 	{
-		this->PreviousGameInputMode = 0;  
+		this->PreviousGameInputMode = 0;
 	}
 	else if (IgnoringInput == true && CaptureMouse == EMouseCaptureMode::NoCapture) //UI Only
 	{
-		this->PreviousGameInputMode = 1;  
+		this->PreviousGameInputMode = 1;
 	}
 	else //Game Only
 	{
-		this->PreviousGameInputMode = 2;  
+		this->PreviousGameInputMode = 2;
 	}
 
+	//Open the UI
+	EmergenceUI = Cast<UEmergenceUI>(Emergence->OpenEmergenceUI(OpeningPlayerController, EmergenceUIBPClass));
+	EmergenceUI->OpeningFinished.AddDynamic(this, &UOpenNFTPicker::EmergenceOverlayReady);
 	OpeningPlayerController->SetShowMouseCursor(true);
 	FInputModeUIOnly InputMode = FInputModeUIOnly();
 	InputMode.SetWidgetToFocus(EmergenceUI->GetCachedWidget());
@@ -92,22 +93,22 @@ void UOpenNFTPicker::AfterOverlayCloseCleanup()
 {
 	OpeningPlayerController->SetShowMouseCursor(this->PreviousMouseShowState);
 	switch (this->PreviousGameInputMode) {
-		case 0:
-			OpeningPlayerController->SetInputMode(FInputModeGameAndUI());
-			break;
-		case 1:
-			OpeningPlayerController->SetInputMode(FInputModeUIOnly());
-			break;
-		case 2:
-			OpeningPlayerController->SetInputMode(FInputModeGameOnly());
-			break;
+	case 0:
+		OpeningPlayerController->SetInputMode(FInputModeGameAndUI());
+		break;
+	case 1:
+		OpeningPlayerController->SetInputMode(FInputModeUIOnly());
+		break;
+	case 2:
+		OpeningPlayerController->SetInputMode(FInputModeGameOnly());
+		break;
 	}
 	EmergenceUI->Closed.RemoveDynamic(this, &UOpenNFTPicker::AfterOverlayCloseCleanup);
 }
 
 void UOpenNFTPicker::EmergenceOverlayReady()
 {
-	static TSubclassOf<UInventoryScreen> InventoryScreenClass = StaticLoadClass(UObject::StaticClass(), OpeningPlayerController, TEXT("/Emergence/Screens/InventoryScreen.InventoryScreen_C"));
+	static TSubclassOf<UInventoryScreen> InventoryScreenClass = StaticLoadClass(UObject::StaticClass(), OpeningPlayerController, TEXT("/Emergence/Screens/InventoryScreenBP.InventoryScreenBP_C"));
 	check(InventoryScreenClass);
 	InventoryScreen = CreateWidget<UInventoryScreen>(OpeningPlayerController->GetWorld(), InventoryScreenClass);
 	InventoryScreen->Filters = this->Filters;

@@ -7,11 +7,12 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-UGetTokenURIData* UGetTokenURIData::GetTokenURIData(const UObject* WorldContextObject, const FString& TokenURI)
+UGetTokenURIData* UGetTokenURIData::GetTokenURIData(UObject* WorldContextObject, const FString& TokenURI)
 {
 	UGetTokenURIData* BlueprintNode = NewObject<UGetTokenURIData>();
 	BlueprintNode->TokenURI = FString(TokenURI);
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -38,9 +39,10 @@ void UGetTokenURIData::GetTokenURIData_HttpRequestComplete(FHttpRequestPtr HttpR
 	StatusCode = EErrorCode::EmergenceOk; //FORCE IT, ONLY FOR TESTING
 	if (StatusCode == EErrorCode::EmergenceOk) {
 		OnGetTokenURIDataCompleted.Broadcast(*HttpResponse->GetContentAsString(), EErrorCode::EmergenceOk);
-		return;
 	}
-
-	OnGetTokenURIDataCompleted.Broadcast(FString(), StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("GetTokenURIData", StatusCode);
+	else {
+		OnGetTokenURIDataCompleted.Broadcast(FString(), StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("GetTokenURIData", StatusCode);
+	}
+	SetReadyToDestroy();
 }

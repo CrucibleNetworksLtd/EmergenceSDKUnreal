@@ -135,7 +135,7 @@ public:
 	 * @param Address Address to get the avatars of.
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence|Avatar Service")
-	static UAvatarByOwner* AvatarByOwner(const UObject* WorldContextObject, const FString& Address);
+	static UAvatarByOwner* AvatarByOwner(UObject* WorldContextObject, const FString& Address);
 
 	virtual void Activate() override;
 
@@ -148,7 +148,7 @@ private:
 
 	void GetMetadata_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 	FString Address;
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 
 	TArray<TPair<FHttpRequestRef, FEmergenceAvatarResult>> Requests;
 	TArray<FEmergenceAvatarResult> Results;

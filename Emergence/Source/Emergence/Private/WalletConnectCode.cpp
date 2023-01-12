@@ -2,7 +2,6 @@
 
 
 #include "WalletConnectCode.h"
-#include "..\Public\WalletConnectCode.h"
 
 TSharedRef<SWidget> UWalletConnectCode::RebuildWidget() {
 	Singleton = UEmergenceSingleton::GetEmergenceManager(this->GetOwningPlayer());

@@ -6,28 +6,30 @@
 #include "Interfaces/IHttpResponse.h"
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
-#include "EmergenceChain.h"
+#include "EmergenceChainObject.h"
 
-UGetBalance* UGetBalance::GetBalance(const UObject* WorldContextObject, FString Address)
+UGetBalance* UGetBalance::GetBalance(UObject* WorldContextObject, FString Address, UEmergenceChain* Blockchain)
 {
 	UGetBalance* BlueprintNode = NewObject<UGetBalance>();
 	BlueprintNode->Address = Address;
-	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->Blockchain = Blockchain;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
 void UGetBalance::Activate()
 {
-	FEmergenceChainStruct ChainData = UChainDataLibrary::GetEmergenceChainDataFromConfig();
-
-	FString NodeURL = ChainData.GetChainURL();
-	UE_LOG(LogEmergenceHttp, Warning, TEXT("Using Node URL: %s"), *NodeURL);
-
-	UHttpHelperLibrary::ExecuteHttpRequest<UGetBalance>(
-		this, 
-		&UGetBalance::GetBalance_HttpRequestComplete, 
-		UHttpHelperLibrary::APIBase + "getbalance" + "?nodeUrl=" + NodeURL + "&address=" + this->Address);
-	UE_LOG(LogEmergenceHttp, Display, TEXT("GetBalance request started with JSON, calling GetBalance_HttpRequestComplete on request completed. Json sent as part of the request: "));
+	if (Blockchain) {
+		UHttpHelperLibrary::ExecuteHttpRequest<UGetBalance>(
+			this,
+			&UGetBalance::GetBalance_HttpRequestComplete,
+			UHttpHelperLibrary::APIBase + "getbalance" + "?nodeUrl=" + Blockchain->NodeURL + "&address=" + this->Address);
+		UE_LOG(LogEmergenceHttp, Display, TEXT("GetBalance request started with JSON, calling GetBalance_HttpRequestComplete on request completed. Json sent as part of the request: "));
+	}
+	else {
+		UE_LOG(LogEmergenceHttp, Error, TEXT("GetBalance's blockchain input was null."));
+		OnGetBalanceCompleted.Broadcast(FString(), EErrorCode::EmergenceClientFailed);
+	}
 }
 
 void UGetBalance::GetBalance_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
@@ -42,7 +44,9 @@ void UGetBalance::GetBalance_HttpRequestComplete(FHttpRequestPtr HttpRequest, FH
 		else {
 			OnGetBalanceCompleted.Broadcast(FString(), EErrorCode::EmergenceClientWrongType);
 		}
-		return;
 	}
-	OnGetBalanceCompleted.Broadcast(FString(), StatusCode);
+	else {
+		OnGetBalanceCompleted.Broadcast(FString(), StatusCode);
+	}
+	SetReadyToDestroy();
 }

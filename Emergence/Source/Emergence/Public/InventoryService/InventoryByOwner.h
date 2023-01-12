@@ -23,7 +23,7 @@ public:
 	 * @param Network Comma seperated list of networks to get the inventory from. To get from all available, enter "ETHEREUM,POLYGON,FLOW,TEZOS,SOLANA,IMMUTABLEX".
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence|Inventory Service")
-	static UInventoryByOwner* InventoryByOwner(const UObject* WorldContextObject, const FString& Address, const FString& Network = "ETHEREUM,POLYGON,FLOW,TEZOS,SOLANA,IMMUTABLEX");
+	static UInventoryByOwner* InventoryByOwner(UObject* WorldContextObject, const FString& Address, const FString& Network = "ETHEREUM,POLYGON,FLOW,TEZOS,SOLANA,IMMUTABLEX");
 
 	virtual void Activate() override;
 
@@ -34,5 +34,5 @@ public:
 private:
 	void InventoryByOwner_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 	FString Address, Network;
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 };

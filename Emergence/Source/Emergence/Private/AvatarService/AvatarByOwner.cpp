@@ -6,11 +6,12 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-UAvatarByOwner* UAvatarByOwner::AvatarByOwner(const UObject* WorldContextObject, const FString& Address)
+UAvatarByOwner* UAvatarByOwner::AvatarByOwner(UObject* WorldContextObject, const FString& Address)
 {
 	UAvatarByOwner* BlueprintNode = NewObject<UAvatarByOwner>();
 	BlueprintNode->Address = FString(Address);
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -54,6 +55,7 @@ void UAvatarByOwner::AvatarByOwner_HttpRequestComplete(FHttpRequestPtr HttpReque
 
 	OnAvatarByOwnerCompleted.Broadcast(TArray<FEmergenceAvatarResult>(), StatusCode);
 	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("AvatarByOwner", StatusCode);
+	SetReadyToDestroy();
 }
 
 void UAvatarByOwner::GetMetadata_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
@@ -72,4 +74,5 @@ void UAvatarByOwner::GetMetadata_HttpRequestComplete(FHttpRequestPtr HttpRequest
 		}
 	}
 	OnAvatarByOwnerCompleted.Broadcast(this->Results, EErrorCode::EmergenceOk);
+	SetReadyToDestroy();
 }

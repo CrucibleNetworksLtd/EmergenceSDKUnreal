@@ -6,21 +6,42 @@
 #include "Interfaces/IHttpResponse.h"
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
-#include "EmergenceChain.h"
+#include "EmergenceChainObject.h"
+#include "WalletService/LoadContractInternal.h"
+#include "EmergenceSingleton.h"
 
-UReadMethod* UReadMethod::ReadMethod(const UObject* WorldContextObject, FString ContractAddress, FString MethodName, TArray<FString> Content, FString CustomNodeURL)
+UReadMethod* UReadMethod::ReadMethod(UObject* WorldContextObject, UEmergenceDeployment* DeployedContract, FEmergenceContractMethod MethodName, TArray<FString> Content)
 {
 	UReadMethod* BlueprintNode = NewObject<UReadMethod>();
-	BlueprintNode->ContractAddress = ContractAddress;
+	BlueprintNode->DeployedContract = DeployedContract;
 	BlueprintNode->MethodName = MethodName;
 	BlueprintNode->Content = Content;
 	BlueprintNode->WorldContextObject = WorldContextObject;
-	BlueprintNode->CustomNodeURL = CustomNodeURL;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
+}
+
+void UReadMethod::LoadContractCompleted(FString Response, EErrorCode StatusCode)
+{
+	if (StatusCode == EErrorCode::EmergenceOk) {
+		this->Activate();
+	}
+	else {
+		OnReadMethodCompleted.Broadcast(FJsonObjectWrapper(), StatusCode);
+	}
 }
 
 void UReadMethod::Activate()
 {
+	UEmergenceSingleton* Singleton = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
+	//if this contract has never had its ABI loaded...
+	if (!Singleton->ContractsWithLoadedABIs.Contains(DeployedContract->Blockchain->Name.ToString() + DeployedContract->Address)) {
+		ULoadContractInternal* LoadContract = ULoadContractInternal::LoadContract(WorldContextObject, DeployedContract);
+		LoadContract->OnLoadContractCompleted.AddDynamic(this, &UReadMethod::LoadContractCompleted);
+		LoadContract->Activate();
+		return;
+	}
+
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Content-Type", "application/json"});
 
@@ -34,14 +55,10 @@ void UReadMethod::Activate()
 	}
 	ContentString.Append("]");
 
-	if (CustomNodeURL.IsEmpty()) {
-		CustomNodeURL = UChainDataLibrary::GetEmergenceChainDataFromConfig().GetChainURL();
-	}
-
 	UHttpHelperLibrary::ExecuteHttpRequest<UReadMethod>(
 		this, 
 		&UReadMethod::ReadMethod_HttpRequestComplete, 
-		UHttpHelperLibrary::APIBase + "readMethod?contractAddress=" + ContractAddress + "&methodName=" + MethodName + "&nodeUrl=" + CustomNodeURL,
+		UHttpHelperLibrary::APIBase + "readMethod?contractAddress=" + DeployedContract->Address + "&network=" + DeployedContract->Blockchain->Name.ToString().Replace(TEXT(" "), TEXT("")) + "&methodName=" + MethodName.MethodName + "&nodeUrl=" + DeployedContract->Blockchain->NodeURL,
 		"POST",
 		60.0F,
 		Headers,
@@ -55,13 +72,14 @@ void UReadMethod::ReadMethod_HttpRequestComplete(FHttpRequestPtr HttpRequest, FH
 	EErrorCode StatusCode;
 	FJsonObject JsonObject = UErrorCodeFunctionLibrary::TryParseResponseAsJson(HttpResponse, bSucceeded, StatusCode);
 	UE_LOG(LogEmergenceHttp, Display, TEXT("ReadMethod_HttpRequestComplete: %s"), *HttpResponse->GetContentAsString());
-	if (StatusCode == EErrorCode::EmergenceOk) {
-		TSharedPtr<FJsonObject> JsonInternalObject;
-		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonObject.GetObjectField("message")->GetStringField("response"));
-		FJsonSerializer::Deserialize(Reader, JsonInternalObject);
-		OnReadMethodCompleted.Broadcast(JsonInternalObject->GetStringField(""), EErrorCode::EmergenceOk);
-		return;
+	if (StatusCode == EErrorCode::EmergenceOk) {	
+		FJsonObjectWrapper OutJsonObject;
+		OutJsonObject.JsonObject = JsonObject.GetObjectField("message");
+		OnReadMethodCompleted.Broadcast(OutJsonObject, EErrorCode::EmergenceOk);
 	}
-	OnReadMethodCompleted.Broadcast(FString(), StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("ReadMethod", StatusCode);
+	else {
+		OnReadMethodCompleted.Broadcast(FJsonObjectWrapper(), StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("ReadMethod", StatusCode);
+	}
+	SetReadyToDestroy();
 }

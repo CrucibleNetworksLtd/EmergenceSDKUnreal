@@ -78,4 +78,8 @@ public:
 	//Called when the UI reaches the home screen.
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FOnClosed OpeningFinished;
+
+	//Gets the default avatar icon from the plugin settings
+	UFUNCTION(BlueprintPure)
+	static TSoftObjectPtr<UTexture2D> GetDefaultAvatarIcon();
 };

@@ -1,7 +1,7 @@
 // Copyright Crucible Networks Ltd 2022. All Rights Reserved.
 
 
-#include "GetTextureFromUrl.h"
+#include "GetTextureFromURL.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "HttpService/HttpHelperLibrary.h"

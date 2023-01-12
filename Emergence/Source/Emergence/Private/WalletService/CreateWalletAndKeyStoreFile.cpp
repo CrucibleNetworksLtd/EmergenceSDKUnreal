@@ -7,12 +7,13 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-UCreateWalletAndKeyStoreFile *UCreateWalletAndKeyStoreFile::CreateWalletAndKeyStoreFile(const UObject *WorldContextObject, const FString &Path, const FString &Password)
+UCreateWalletAndKeyStoreFile *UCreateWalletAndKeyStoreFile::CreateWalletAndKeyStoreFile(UObject *WorldContextObject, const FString &Path, const FString &Password)
 {
 	UCreateWalletAndKeyStoreFile *BlueprintNode = NewObject<UCreateWalletAndKeyStoreFile>();
 	BlueprintNode->Path = Path;
 	BlueprintNode->Password = Password;
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -41,8 +42,9 @@ void UCreateWalletAndKeyStoreFile::CreateWalletAndKeyStoreFile_HttpRequestComple
 	if (StatusCode == EErrorCode::EmergenceOk)
 	{
 		OnCreateWalletAndKeyStoreFileCompleted.Broadcast(FString(), EErrorCode::EmergenceOk);
-		return;
 	}
-	OnCreateWalletAndKeyStoreFileCompleted.Broadcast(FString(), StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("CreateWalletAndKeyStoreFile", StatusCode);
+	else {
+		OnCreateWalletAndKeyStoreFileCompleted.Broadcast(FString(), StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("CreateWalletAndKeyStoreFile", StatusCode);
+	}
 }

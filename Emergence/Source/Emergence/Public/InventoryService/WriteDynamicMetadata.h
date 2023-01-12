@@ -26,8 +26,8 @@ public:
 	 * @param Contract The contact that we're writing to.
 	 * @param OnlyUpdate Should we only try to update existing metadata, or write new metadata if it doesn't exist.
 	 */
-	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence|Inventory Service")
-	static UWriteDynamicMetadata* WriteDynamicMetadata(const UObject* WorldContextObject, const FString& Network, const FString& AuthorizationHeader, const FString& Contract, const FString& TokenID, const FString& Metadata);
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject", AuthorizationHeader = "0iKoO1V2ZG98fPETreioOyEireDTYwby"), Category = "Emergence|Inventory Service")
+	static UWriteDynamicMetadata* WriteDynamicMetadata(UObject* WorldContextObject, const FString& Network, const FString& AuthorizationHeader, const FString& Contract, const FString& TokenID, const FString& Metadata);
 
 	virtual void Activate() override;
 
@@ -39,5 +39,5 @@ private:
 	void WriteDynamicMetadata_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 	FString AuthorizationHeader, Network, Contract, TokenID, Metadata;
 	bool OnlyUpdate;
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 };

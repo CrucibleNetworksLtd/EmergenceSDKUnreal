@@ -7,7 +7,7 @@
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
-#include "PersonaStructs.h"
+#include "EmergenceChainObject.h"
 #include "GetBalance.generated.h"
 
 UCLASS()
@@ -18,9 +18,10 @@ public:
 	/**
 	 * Gets the balance of the given address.
 	 * @param Address Address to get the balance of.
+	 * @param Blockchain Blockchain to get the balance on.
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence Internal|Overlay Methods")
-	static UGetBalance* GetBalance(const UObject* WorldContextObject, FString Address);
+	static UGetBalance* GetBalance(UObject* WorldContextObject, FString Address, UEmergenceChain* Blockchain);
 
 	virtual void Activate() override;
 
@@ -30,6 +31,6 @@ public:
 	FOnGetBalanceCompleted OnGetBalanceCompleted;
 private:
 	void GetBalance_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	const UObject* WorldContextObject;
 	FString Address;
+	UEmergenceChain* Blockchain;
 };

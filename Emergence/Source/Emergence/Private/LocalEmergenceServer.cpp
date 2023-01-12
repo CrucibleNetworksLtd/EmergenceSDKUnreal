@@ -3,9 +3,10 @@
 
 #include "LocalEmergenceServer.h"
 #include "HttpService/HttpHelperLibrary.h"
-#include "Windows/WindowsSystemIncludes.h"
 
-//Stuff for the windows api stuff, probably should be incapsulated so it doesn't build when we start working on none-windows stuff
+
+#if PLATFORM_WINDOWS
+#include "Windows/WindowsSystemIncludes.h"
 #include "Windows/AllowWindowsPlatformTypes.h"
 #include "Windows/prewindowsapi.h"
 
@@ -20,16 +21,20 @@
 
 #include "Windows/PostWindowsApi.h"
 #include "Windows/HideWindowsPlatformTypes.h"
-
+#endif
 void ULocalEmergenceServer::LaunchLocalServerProcess(bool LaunchHidden)
 {
 	if (!UHttpHelperLibrary::APIBase.IsEmpty()) { //if we think we may already have a server
 		UE_LOG(LogEmergenceHttp, Error, TEXT("The server has already been started or was closed without calling KillLocalServerProcess. This causes Emergence's internal state to get messed up, don't do this."));
 		return;
 	}
-
-	FString EmergenceServerBinariesPath = FString(FWindowsPlatformProcess::BaseDir()) + "/EmergenceEVMLocalServer.exe";
-	FString EmergenceServerPluginPath = FString(FPaths::ProjectPluginsDir() + "Emergence/EmergenceServer/EmergenceEVMLocalServer.exe");
+#if PLATFORM_WINDOWS
+	FString EmergenceServerBinariesPath = FString(FPlatformProcess::BaseDir()) + "/EmergenceEVMLocalServer.exe";
+	FString EmergenceServerPluginPath = FString(FPaths::ProjectPluginsDir() + "Emergence/EmergenceServer/Windows/EmergenceEVMLocalServer.exe");
+#else
+	FString EmergenceServerBinariesPath = FString(FPlatformProcess::BaseDir()) + "/EmergenceEVMLocalServer";
+	FString EmergenceServerPluginPath = FString(FPaths::ProjectPluginsDir() + "Emergence/EmergenceServer/Mac/EmergenceEVMLocalServer");
+#endif	
 	FString LoadPath;
 	if (FPaths::FileExists(EmergenceServerBinariesPath)) {
 		LoadPath = EmergenceServerBinariesPath;
@@ -66,7 +71,7 @@ void ULocalEmergenceServer::LaunchLocalServerProcess(bool LaunchHidden)
 	TArray<FString> Args = {
 		"--urls=\"" + ServerURL + "\"",
 		"--walletconnect=" + JsonArgs,
-		"--processid=" + FString::FromInt(FWindowsPlatformProcess::GetCurrentProcessId())
+		"--processid=" + FString::FromInt(FPlatformProcess::GetCurrentProcessId())
 	};
 
 	//combine the args
@@ -91,6 +96,7 @@ void ULocalEmergenceServer::KillLocalServerProcess()
 	UHttpHelperLibrary::APIBase.Empty();
 }
 
+#if PLATFORM_WINDOWS
 bool ULocalEmergenceServer::GetUsedTCPPorts(TArray<int>& UsedPorts) {
 	PMIB_TCPTABLE2 pTcpTable;
 	ULONG ulSize = 0;
@@ -155,3 +161,13 @@ int ULocalEmergenceServer::GetNextFreePort()
 	UE_LOG(LogEmergenceHttp, Error, TEXT("Couldn't find a free port!"));
 	return -1;
 }
+#else
+bool ULocalEmergenceServer::GetUsedTCPPorts(TArray<int>& UsedPorts) {
+	return false;
+}
+
+int ULocalEmergenceServer::GetNextFreePort()
+{
+	return 57000;
+}
+#endif

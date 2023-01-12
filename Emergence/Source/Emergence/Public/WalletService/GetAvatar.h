@@ -20,7 +20,7 @@ public:
 	 * @param ImageMetadataURI Usually the output of a ReadMethod call.
 	 */
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get ERC721 Image from URI", BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence Internal|Interface Helpers")
-	static UGetAvatar* GetAvatar(const UObject* WorldContextObject, FString ImageMetadataURI);
+	static UGetAvatar* GetAvatar(UObject* WorldContextObject, FString ImageMetadataURI);
 
 	virtual void Activate() override;
 
@@ -33,7 +33,7 @@ private:
 
 	UFUNCTION()
 	void AvatarReturned(UTexture2D* Texture, EErrorCode StatusCode);
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 	FString ImageMetadataURI;
 	FString ERC721Name;
 	int TokenId;

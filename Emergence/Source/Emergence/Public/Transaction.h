@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "JsonObjectConverter.h"
 #include "Transaction.generated.h"
 
 USTRUCT(BlueprintType)

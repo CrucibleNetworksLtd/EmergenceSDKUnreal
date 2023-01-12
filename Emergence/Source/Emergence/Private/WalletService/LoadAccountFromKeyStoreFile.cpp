@@ -7,49 +7,55 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-ULoadAccountFromKeyStoreFile* ULoadAccountFromKeyStoreFile::LoadAccountFromKeyStoreFile(const UObject* WorldContextObject, const FString &Name, const FString &Password, const FString &Path, const FString &NodeURL, const FString& ChainID)
+ULoadAccountFromKeyStoreFile* ULoadAccountFromKeyStoreFile::LoadAccountFromKeyStoreFile(UObject* WorldContextObject, const FString &Name, const FString &Password, const FString &Path, const UEmergenceChain* Blockchain)
 {
 	ULoadAccountFromKeyStoreFile* BlueprintNode = NewObject<ULoadAccountFromKeyStoreFile>();
 	BlueprintNode->Name = Name;
 	BlueprintNode->Password = Password;
 	BlueprintNode->Path = Path;
-	BlueprintNode->NodeURL = NodeURL;
-	BlueprintNode->ChainID = ChainID;
+	BlueprintNode->Blockchain = Blockchain;
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
 void ULoadAccountFromKeyStoreFile::Activate()
 {
-	Path = Path.Replace(TEXT(" "), TEXT("%20"));
+	if (Blockchain) {
+		Path = Path.Replace(TEXT(" "), TEXT("%20"));
 
-	auto Emergence = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
-	FString AccessToken = Emergence->GetCurrentAccessToken();
+		auto Emergence = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
+		FString AccessToken = Emergence->GetCurrentAccessToken();
 
-	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
-	Json->SetStringField("name", this->Name);
-	Json->SetStringField("password", this->Password);
-	Json->SetStringField("path", this->Path);
-	Json->SetStringField("nodeURL", this->NodeURL);
-	Json->SetStringField("ChainID", this->ChainID);
+		TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+		Json->SetStringField("name", this->Name);
+		Json->SetStringField("password", this->Password);
+		Json->SetStringField("path", this->Path);
+		Json->SetStringField("nodeURL", this->Blockchain->NodeURL);
+		Json->SetStringField("ChainID", FString::FromInt(this->Blockchain->ChainID));
 
-	FString OutputString;
-	TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&OutputString);
-	FJsonSerializer::Serialize(Json.ToSharedRef(), Writer);
+		FString OutputString;
+		TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&OutputString);
+		FJsonSerializer::Serialize(Json.ToSharedRef(), Writer);
 
-	TArray<TPair<FString, FString>> Headers;
-	Headers.Add(TPair<FString, FString>{"Content-Type", "application/json"});
-	Headers.Add(TPair<FString, FString>{"Authorization", AccessToken});
-	UHttpHelperLibrary::ExecuteHttpRequest<ULoadAccountFromKeyStoreFile>(
-		this,
-		&ULoadAccountFromKeyStoreFile::LoadAccountFromKeyStoreFile_HttpRequestComplete,
-		UHttpHelperLibrary::APIBase + "loadAccount",
-		"POST",
-		60.0F,
-		Headers,
-		OutputString);
-	UE_LOG(LogEmergenceHttp, Display, TEXT("LoadAccountFromKeyStoreFile request started with JSON, calling LoadAccountFromKeyStoreFile_HttpRequestComplete on request completed. Json sent as part of the request: "));
-	UE_LOG(LogEmergenceHttp, Display, TEXT("%s"), *OutputString);
+		TArray<TPair<FString, FString>> Headers;
+		Headers.Add(TPair<FString, FString>{"Content-Type", "application/json"});
+		Headers.Add(TPair<FString, FString>{"Authorization", AccessToken});
+		UHttpHelperLibrary::ExecuteHttpRequest<ULoadAccountFromKeyStoreFile>(
+			this,
+			&ULoadAccountFromKeyStoreFile::LoadAccountFromKeyStoreFile_HttpRequestComplete,
+			UHttpHelperLibrary::APIBase + "loadAccount",
+			"POST",
+			60.0F,
+			Headers,
+			OutputString);
+		UE_LOG(LogEmergenceHttp, Display, TEXT("LoadAccountFromKeyStoreFile request started with JSON, calling LoadAccountFromKeyStoreFile_HttpRequestComplete on request completed. Json sent as part of the request: "));
+		UE_LOG(LogEmergenceHttp, Display, TEXT("%s"), *OutputString);
+	}
+	else {
+		UE_LOG(LogEmergenceHttp, Error, TEXT("LoadAccountFromKeyStoreFile's blockchain input was null."));
+		OnLoadAccountFromKeyStoreFileCompleted.Broadcast(FString(), EErrorCode::EmergenceClientFailed);
+	}
 }
 
 void ULoadAccountFromKeyStoreFile::LoadAccountFromKeyStoreFile_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
@@ -64,4 +70,5 @@ void ULoadAccountFromKeyStoreFile::LoadAccountFromKeyStoreFile_HttpRequestComple
 		OnLoadAccountFromKeyStoreFileCompleted.Broadcast(FString(), StatusCode);
 		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("LoadAccountFromKeyStoreFile", StatusCode);
 	}
+	SetReadyToDestroy();
 }

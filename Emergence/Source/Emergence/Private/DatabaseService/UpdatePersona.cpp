@@ -6,11 +6,12 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-UUpdatePersona* UUpdatePersona::UpdatePersona(const UObject* WorldContextObject, FEmergencePersona Persona)
+UUpdatePersona* UUpdatePersona::UpdatePersona(UObject* WorldContextObject, FEmergencePersona Persona)
 {
 	UUpdatePersona* BlueprintNode = NewObject<UUpdatePersona>();
 	BlueprintNode->Persona = Persona;
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -40,8 +41,10 @@ void UUpdatePersona::UpdatePersona_HttpRequestComplete(FHttpRequestPtr HttpReque
 	if (StatusCode == EErrorCode::EmergenceOk) {
 		FEmergencePersona ResponceStruct = FEmergencePersona(*HttpResponse->GetContentAsString());
 		OnUpdatePersonaCompleted.Broadcast(ResponceStruct, EErrorCode::EmergenceOk);
-		return;
 	}
-	OnUpdatePersonaCompleted.Broadcast(this->Persona, StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("UpdatePersona", StatusCode);
+	else {
+		OnUpdatePersonaCompleted.Broadcast(this->Persona, StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("UpdatePersona", StatusCode);
+	}
+	SetReadyToDestroy();
 }

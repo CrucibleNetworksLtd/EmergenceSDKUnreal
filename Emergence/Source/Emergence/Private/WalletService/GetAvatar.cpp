@@ -8,11 +8,12 @@
 #include "EmergenceSingleton.h"
 #include "GetTextureFromURL.h"
 
-UGetAvatar* UGetAvatar::GetAvatar(const UObject* WorldContextObject, FString ImageMetadataURI)
+UGetAvatar* UGetAvatar::GetAvatar(UObject* WorldContextObject, FString ImageMetadataURI)
 {
 	UGetAvatar* BlueprintNode = NewObject<UGetAvatar>();
 	BlueprintNode->ImageMetadataURI = ImageMetadataURI;
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -34,10 +35,12 @@ void UGetAvatar::GetAvatar_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHtt
 		UGetTextureFromUrl* GetTextureFromUrlRequest = UGetTextureFromUrl::TextureFromUrl(JsonObject.GetStringField("image"), this->WorldContextObject, true);
 		GetTextureFromUrlRequest->OnGetTextureFromUrlCompleted.AddDynamic(this, &UGetAvatar::AvatarReturned);
 		GetTextureFromUrlRequest->Activate();
-		return;
 	}
-	OnGetAvatarCompleted.Broadcast(nullptr, FString(), StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("GetAvatar", StatusCode);
+	else {
+		OnGetAvatarCompleted.Broadcast(nullptr, FString(), StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("GetAvatar", StatusCode);
+	}
+	SetReadyToDestroy();
 }
 
 void UGetAvatar::AvatarReturned(UTexture2D* Texture, EErrorCode StatusCode)

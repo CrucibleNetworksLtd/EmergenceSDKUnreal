@@ -24,7 +24,7 @@ public:
 	 * @warning The directory that will contain the file does need to already exist, as only a file will be created.
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence|Keystore Local Wallet")
-	static UCreateKeyStoreFile *CreateKeyStoreFile(const UObject *WorldContextObject, const FString &PrivateKey, const FString &Password, const FString &PublicKey, const FString &Path);
+	static UCreateKeyStoreFile *CreateKeyStoreFile(UObject *WorldContextObject, const FString &PrivateKey, const FString &Password, const FString &PublicKey, const FString &Path);
 
 	virtual void Activate() override;
 
@@ -39,5 +39,5 @@ private:
 	FString PublicKey;
 	FString Path;
 	void CreateKeyStoreFile_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	const UObject *WorldContextObject;
+	UObject *WorldContextObject;
 };

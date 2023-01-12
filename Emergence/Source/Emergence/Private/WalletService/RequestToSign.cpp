@@ -7,11 +7,12 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-URequestToSign* URequestToSign::RequestToSign(const UObject* WorldContextObject, const FString& MessageToSign)
+URequestToSign* URequestToSign::RequestToSign(UObject* WorldContextObject, const FString& MessageToSign)
 {
 	URequestToSign* BlueprintNode = NewObject<URequestToSign>();
 	BlueprintNode->MessageToSign = MessageToSign;
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -42,8 +43,10 @@ void URequestToSign::RequestToSign_HttpRequestComplete(FHttpRequestPtr HttpReque
 			OnRequestToSignCompleted.Broadcast("", EErrorCode::EmergenceInternalError);
 			UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("RequestToSign", StatusCode);
 		}
-		return;
 	}
-	OnRequestToSignCompleted.Broadcast("", StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("RequestToSign", StatusCode);
+	else {
+		OnRequestToSignCompleted.Broadcast("", StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("RequestToSign", StatusCode);
+	}
+	SetReadyToDestroy();
 }

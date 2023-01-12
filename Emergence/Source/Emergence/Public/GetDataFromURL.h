@@ -8,7 +8,7 @@
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
 #include "Emergence.h"
-#include "GetDataFromUrl.generated.h"
+#include "GetDataFromURL.generated.h"
 /**
  */
 UCLASS()
@@ -18,17 +18,18 @@ class EMERGENCE_API UGetDataFromUrl : public UBlueprintAsyncActionBase
 public:
 	//Takes a URL string and gets the data.
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName="Get Data From URL", WorldContext = "WorldContextObject"), Category = "Emergence|Helpers")
-	static UGetDataFromUrl* GetDataFromUrl(const UObject* WorldContextObject, const FString& Url) {
+	static UGetDataFromUrl* GetDataFromUrl(UObject* WorldContextObject, const FString& Url) {
 		UGetDataFromUrl* BlueprintNode = NewObject<UGetDataFromUrl>(); //I don't know why, but every time I tried to put this in the cpp file it wouldn't link it properly and would fail to compile. If you think you can fix it, go ahead.
 		
 		BlueprintNode->Url = FString(Url);
 		BlueprintNode->WorldContextObject = WorldContextObject;
+		BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 		return BlueprintNode;
 	}
 
 	virtual void Activate() override;
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnGetDataFromUrlCompleted, const TArray<uint8>&, Data, EErrorCode, StatusCode, bool, Success);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnGetDataFromUrlCompleted, const TArray<uint8>&, Data, FString, String, EErrorCode, StatusCode, bool, Success);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnGetDataFromUrlCompleted OnGetDataFromUrlCompleted;
@@ -37,5 +38,5 @@ private:
 	void GetDataFromUrl_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 
 	FString Url;
-	const UObject* WorldContextObject;
+	UObject* WorldContextObject;
 };

@@ -7,11 +7,12 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-UDeletePersonaByID* UDeletePersonaByID::DeletePersonaByID(const UObject* WorldContextObject, const FString& PersonaID)
+UDeletePersonaByID* UDeletePersonaByID::DeletePersonaByID(UObject* WorldContextObject, const FString& PersonaID)
 {
 	UDeletePersonaByID* BlueprintNode = NewObject<UDeletePersonaByID>();
 	BlueprintNode->PersonaID = FString(PersonaID);
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -39,8 +40,10 @@ void UDeletePersonaByID::DeletePersonaByID_HttpRequestComplete(FHttpRequestPtr H
 		UE_LOG(LogEmergenceHttp, Display, TEXT("Response: %s"), *HttpResponse->GetContentAsString());
 		FEmergencePersona ResponceStruct = FEmergencePersona(*HttpResponse->GetContentAsString());
 		OnDeletePersonaByIDCompleted.Broadcast(ResponceStruct, EErrorCode::EmergenceOk);
-		return;
 	}
-	OnDeletePersonaByIDCompleted.Broadcast(FEmergencePersona(), StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("DeletePersonaById", StatusCode);
+	else {
+		OnDeletePersonaByIDCompleted.Broadcast(FEmergencePersona(), StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("DeletePersonaById", StatusCode);
+	}
+	SetReadyToDestroy();
 }

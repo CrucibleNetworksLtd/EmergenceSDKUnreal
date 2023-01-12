@@ -65,3 +65,12 @@ void UEmergenceUI::Close()
 	this->RemoveFromParent();
 	this->Closed.Broadcast();
 }
+
+TSoftObjectPtr<UTexture2D> UEmergenceUI::GetDefaultAvatarIcon()
+{
+	FString DefaultAvatarIconString;
+	if (!GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("DefaultAvatarIcon"), DefaultAvatarIconString, GGameIni)) {
+		DefaultAvatarIconString = "/Emergence/Components/UE.UE";
+	}
+	return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("Texture2D'" + DefaultAvatarIconString + "'"));
+}

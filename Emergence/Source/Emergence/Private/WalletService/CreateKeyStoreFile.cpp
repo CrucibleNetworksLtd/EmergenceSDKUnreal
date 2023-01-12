@@ -8,7 +8,7 @@
 #include "EmergenceSingleton.h"
 
 UCreateKeyStoreFile *UCreateKeyStoreFile::CreateKeyStoreFile(
-	const UObject *WorldContextObject,
+	UObject *WorldContextObject,
 	const FString &PrivateKey,
 	const FString &Password,
 	const FString &PublicKey,
@@ -20,6 +20,7 @@ UCreateKeyStoreFile *UCreateKeyStoreFile::CreateKeyStoreFile(
 	BlueprintNode->PublicKey = PublicKey;
 	BlueprintNode->Path = Path;
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -49,8 +50,10 @@ void UCreateKeyStoreFile::CreateKeyStoreFile_HttpRequestComplete(FHttpRequestPtr
 	if (StatusCode == EErrorCode::EmergenceOk)
 	{
 		OnCreateKeyStoreFileCompleted.Broadcast(FString(), EErrorCode::EmergenceOk);
-		return;
 	}
-	OnCreateKeyStoreFileCompleted.Broadcast(FString(), StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("CreateKeyStoreFile", StatusCode);
+	else {
+		OnCreateKeyStoreFileCompleted.Broadcast(FString(), StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("CreateKeyStoreFile", StatusCode);
+	}
+	SetReadyToDestroy();
 }

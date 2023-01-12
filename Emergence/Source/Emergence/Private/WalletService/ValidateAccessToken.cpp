@@ -7,11 +7,12 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 
-UValidateAccessToken* UValidateAccessToken::ValidateAccessToken(const UObject* WorldContextObject, const FString& AccessToken)
+UValidateAccessToken* UValidateAccessToken::ValidateAccessToken(UObject* WorldContextObject, const FString& AccessToken)
 {
 	UValidateAccessToken* BlueprintNode = NewObject<UValidateAccessToken>();
 	BlueprintNode->AccessToken = AccessToken;
 	BlueprintNode->WorldContextObject = WorldContextObject;
+	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }
 
@@ -44,8 +45,10 @@ void UValidateAccessToken::ValidateAccessToken_HttpRequestComplete(FHttpRequestP
 			OnValidateAccessTokenCompleted.Broadcast(isValidToken, StatusCode);
 			UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("ValidateAccessToken", StatusCode);
 		}
-		return;
 	}
-	OnValidateAccessTokenCompleted.Broadcast(isValidToken, StatusCode);
-	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("ValidateAccessToken", StatusCode);
+	else {
+		OnValidateAccessTokenCompleted.Broadcast(isValidToken, StatusCode);
+		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("ValidateAccessToken", StatusCode);
+	}
+	SetReadyToDestroy();
 }
