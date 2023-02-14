@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -12,10 +12,10 @@ struct FEmergenceAvatarData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence Internal|Avatar Service|AvatarData")
 	FEmergenceAvatarResult AvatarNFT;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence Internal|Avatar Service|AvatarData")
 	FEmergenceAvatarMetadata Avatar;
 };
 

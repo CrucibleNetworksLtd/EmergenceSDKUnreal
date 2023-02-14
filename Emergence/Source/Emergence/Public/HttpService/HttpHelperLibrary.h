@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -8,6 +8,8 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Misc/EngineVersion.h"
 #include "Interfaces/IPluginManager.h"
+#include "EmergenceSingleton.h"
+#include "PlatformHttp.h"
 #include "HttpHelperLibrary.generated.h"
 
 /**
@@ -183,8 +185,8 @@ public:
 			}
 		}
 
-		FString Version = FEngineVersion::Current().ToString() + " Emergence " + GetEmergenceVersionNumber();
-		HttpRequest->SetHeader("User-Agent", Version);
+		FString Version = "Emergence " + GetEmergenceVersionNumber();
+		HttpRequest->SetHeader("User-Agent", FPlatformHttp::GetDefaultUserAgent() + " " + Version);
 
 		if (Content.Len() > 0 && HttpRequest->GetHeader("Content-Type").Len() > 0) {
 			HttpRequest->SetContentAsString(Content);

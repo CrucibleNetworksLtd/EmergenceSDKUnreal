@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -6,6 +6,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Emergence.h"
+#include "Dom/JsonObject.h"
+#include "Runtime/Core/Public/Misc/ConfigCacheIni.h"
 #include "ErrorCodeFunctionLibrary.generated.h"
 
 UENUM(BlueprintType)
@@ -77,13 +79,13 @@ public:
 	//Gets any pre-content parse errors
 	static EErrorCode GetResponseErrors(FHttpResponsePtr HttpResponse, bool bSucceeded);
 
-	UFUNCTION(BlueprintPure, meta = (DisplayName = "Status Code Int To Status Code Enum", CompactNodeTitle = "->", BlueprintAutocast))
+	UFUNCTION(BlueprintPure, Category="Emergence|Error Code Helpers", meta = (DisplayName = "Status Code Int To Status Code Enum", CompactNodeTitle = "->", BlueprintAutocast))
 	static EErrorCode Conv_IntToErrorCode(int32 HttpStatus);
 
-	UFUNCTION(BlueprintPure, meta = (DisplayName = "Status Code Enum to Status Code Int", CompactNodeTitle = "->", BlueprintAutocast))
+	UFUNCTION(BlueprintPure, Category="Emergence|Error Code Helpers", meta = (DisplayName = "Status Code Enum to Status Code Int", CompactNodeTitle = "->", BlueprintAutocast))
 	static int32 Conv_ErrorCodeToInt(EErrorCode ErrorCode);
 
-	UFUNCTION(BlueprintPure, meta = (DisplayName = "Status Code Enum to Status Ok Bool", CompactNodeTitle = "->", BlueprintAutocast))
+	UFUNCTION(BlueprintPure, Category="Emergence|Error Code Helpers", meta = (DisplayName = "Status Code Enum to Status Ok Bool", CompactNodeTitle = "->", BlueprintAutocast))
 	static bool Conv_ErrorCodeToBool(EErrorCode ErrorCode);
 
 	static const TMap<int32, TEnumAsByte<EErrorCode>> StatusCodeIntToErrorCode;

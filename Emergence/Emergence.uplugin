@@ -1,14 +1,14 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.3.0",
+	"VersionName": "0.3.1.2",
 	"FriendlyName": "Emergence",
 	"Description": "",
 	"Category": "Metaverse",
 	"CreatedBy": "Crucible",
 	"CreatedByURL": "https://crucible.network/",
 	"DocsURL": "https://docs.openmetadao.com/",
-	"MarketplaceURL": "",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/2a2ac549e90440b59cc331c53de19e88",
 	"SupportURL": "https://discord.gg/openmeta",
 	"CanContainContent": true,
 	"IsBetaVersion": true,
@@ -18,17 +18,29 @@
 		{
 			"Name": "Emergence",
 			"Type": "Runtime",
-			"LoadingPhase": "PreDefault"
+			"LoadingPhase": "PreDefault",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32"
+			]
 		},
 		{
 			"Name": "EmergenceEditor",
 			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32"
+			]
 		},
 		{
 			"Name": "EmergenceEditorMethodGraphPin",
 			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32"
+			]
 		}
 	]
 }

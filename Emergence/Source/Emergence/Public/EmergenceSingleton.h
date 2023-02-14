@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -15,6 +15,7 @@
 #include "UI/EmergenceUI.h"
 #include "GameFramework/PlayerController.h"
 #include "Emergence.h"
+#include "Brushes/SlateDynamicImageBrush.h"
 #include "EmergenceSingleton.generated.h"
 
 #pragma warning( push )
@@ -43,7 +44,9 @@ public:
 
 	void SetCachedCurrentPersona(FEmergencePersona NewCachedCurrentPersona);
 
-	UPROPERTY(BlueprintReadOnly)
+	inline static FString DeviceID;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Emergence")
 	FEmergencePersona CachedCurrentPersona;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCachedPersonaUpdated, FEmergencePersona, NewPersona);
@@ -63,18 +66,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|Overlay Methods")
 	void FlushOwnedAvatarNFTCache();
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence Internal|Overlay Methods")
 	bool GetAvatarByGUIDFromCache(FString GUID, FEmergenceAvatarMetadata& FoundAvatar);
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = "Emergence Internal|Overlay Methods")
 	TArray<FEmergenceAvatarResult> OwnedAvatarNFTCache;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOwnedAvatarNFTCacheUpdated);
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, Category = "Emergence Internal|Overlay Methods")
 	FOnOwnedAvatarNFTCacheUpdated OnOwnedAvatarNFTCacheUpdated;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = "Emergence Internal|Overlay Methods")
 	bool OwnedAvatarNFTCached = false;
 
 	//HTTPService Functions
@@ -112,35 +115,35 @@ private:
 	UEmergenceUI* CurrentEmergenceUI;
 public:
 	//Cancels any open GetAccessToken and GetHandshake requests.
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|Emergence Singleton")
 	void CancelSignInRequest();
 
 	//Returns the last access token. Consider calling "HasAcessToken" before you call this. If we don't have an access token yet, returns "-1".
-	UFUNCTION(BlueprintPure, Meta = (DisplayName="Get Cached Access Token"))
+	UFUNCTION(Category = "Emergence|Emergence Singleton", BlueprintPure, Meta = (DisplayName="Get Cached Access Token"))
 	FString GetCurrentAccessToken();
 
 	//Opens the Emergence UI, returns the widget to focus
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence|Emergence Singleton")
 	UEmergenceUI* OpenEmergenceUI(APlayerController* OwnerPlayerController, TSubclassOf<UEmergenceUI> EmergenceUIClass);
 
 	//Gets the Emergence UI
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence|Emergence Singleton")
 	UEmergenceUI* GetEmergenceUI();
 
 	//Do we have an access token?
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence|Emergence Singleton")
 	bool HasAccessToken();
 
 	//Do we have a wallet connected address?
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence|Emergence Singleton")
 	bool HasCachedAddress();
 
 	//Returns the last wallet connected address (if GetHandshake has been called already) If we don't have one yet, returns "-1".
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence|Emergence Singleton")
 	FString GetCachedAddress();
 
 	//GetWalletConnectURI stuff
-	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|Overlay Methods")
+	UFUNCTION(BlueprintCallable, meta=(DeprecatedFunction), Category = "Emergence Internal|Overlay Methods")
 	void GetWalletConnectURI();
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAnyRequestError, FString, ConnectionName, EErrorCode, StatusCode);

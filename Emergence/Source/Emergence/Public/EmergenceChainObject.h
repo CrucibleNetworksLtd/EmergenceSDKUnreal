@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -21,22 +21,22 @@ public:
 
 	UEmergenceChain(FText Name, FString _NodeURL, FString Symbol);
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Blockchain")
 	FText Name;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Blockchain")
 	FString NodeURL;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Blockchain")
 	FString Symbol;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Blockchain")
 	int ChainID;
 
 
 	UFUNCTION()
 	static UEmergenceChain* GetEmergenceChainDataFromConfig(const UObject* Outer);
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category="Emergence|Blockchain")
 	static UEmergenceChain* CreateEmergenceChain(FText _Name, FString _NodeURL, FString _Symbol, int _ChainID);
 };

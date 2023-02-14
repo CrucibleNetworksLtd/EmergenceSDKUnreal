@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 
 #include "WalletService/LoadAccountFromKeyStoreFile.h"
@@ -21,6 +21,9 @@ ULoadAccountFromKeyStoreFile* ULoadAccountFromKeyStoreFile::LoadAccountFromKeySt
 
 void ULoadAccountFromKeyStoreFile::Activate()
 {
+#if UNREAL_MARKETPLACE_BUILD
+	UE_LOG(LogEmergenceHttp, Error, TEXT("LoadAccountFromKeyStoreFile cannot be used on the Unreal Marketplace build."));
+#else
 	if (Blockchain) {
 		Path = Path.Replace(TEXT(" "), TEXT("%20"));
 
@@ -56,6 +59,7 @@ void ULoadAccountFromKeyStoreFile::Activate()
 		UE_LOG(LogEmergenceHttp, Error, TEXT("LoadAccountFromKeyStoreFile's blockchain input was null."));
 		OnLoadAccountFromKeyStoreFileCompleted.Broadcast(FString(), EErrorCode::EmergenceClientFailed);
 	}
+#endif
 }
 
 void ULoadAccountFromKeyStoreFile::LoadAccountFromKeyStoreFile_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)

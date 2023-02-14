@@ -1,8 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 
 #include "WalletService/EmergenceJSONHelpers.h"
-#include "Json.h"
 #include "JsonObjectConverter.h"
 
 bool UEmergenceJSONHelpers::ReadMethodJSONToString(FJsonObjectWrapper JSONObject, FString& OutputString)

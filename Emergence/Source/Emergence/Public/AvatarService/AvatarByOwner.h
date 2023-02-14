@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -18,26 +18,26 @@ struct FEmergenceAvatarMetadata
 
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString Name;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Metadata")
+	FString Name;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString Creator;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Metadata")
+	FString Creator;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString Type;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Metadata")
+	FString Type;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString UriBase;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Metadata")
+	FString UriBase;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 MaxTotalSize;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Metadata")
+	int32 MaxTotalSize;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 MaxTotalVertices;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Metadata")
+	int32 MaxTotalVertices;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString GUID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Metadata")
+	FString GUID;
 
 	FEmergenceAvatarMetadata() {};
 
@@ -66,28 +66,28 @@ struct FEmergenceAvatarResult
 
   GENERATED_BODY()
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Result")
   FString avatarId;
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Result")
   FString contractAddress;
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Result")
   FString tokenId;
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Result")
   FString tokenURI;
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Result")
   TArray<FEmergenceAvatarMetadata> Avatars;
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Result")
   int32 lastUpdated;
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Result")
   FString chain;
 
-  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Result")
   FEmergenceInventoryItemMeta meta;
 
   FEmergenceAvatarResult() {};

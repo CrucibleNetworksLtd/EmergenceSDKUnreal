@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #include "WalletService/CreateKeyStoreFile.h"
 #include "DatabaseService/SetActivePersona.h"
@@ -26,6 +26,9 @@ UCreateKeyStoreFile *UCreateKeyStoreFile::CreateKeyStoreFile(
 
 void UCreateKeyStoreFile::Activate()
 {
+#if UNREAL_MARKETPLACE_BUILD
+	UE_LOG(LogEmergenceHttp, Error, TEXT("CreateKeyStoreFile cannot be used on the Unreal Marketplace build."));
+#else
 	Path = Path.Replace(TEXT(" "), TEXT("%20"));
 
 	auto Emergence = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
@@ -41,6 +44,7 @@ void UCreateKeyStoreFile::Activate()
 		60.0F,
 		Headers);
 	UE_LOG(LogEmergenceHttp, Display, TEXT("CreateKeyStoreFile request started, calling CreateKeyStoreFile_HttpRequestComplete on request completed"));
+#endif
 }
 
 void UCreateKeyStoreFile::CreateKeyStoreFile_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)

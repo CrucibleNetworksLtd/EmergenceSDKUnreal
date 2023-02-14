@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -16,6 +16,6 @@ class UEmergenceScreen : public UUserWidget
 	GENERATED_BODY()
 public:
 	//Get the main Emergence UI instance that is holding this screen.
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence Internal|UI")
 	UEmergenceUI* GetEmergenceUI();
 };

@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -15,19 +15,19 @@ class EMERGENCE_API UEmergenceCarouselItem : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI|CarouselItem")
 	void SetIndex(int indexParam, float targetXParam, bool immediate);
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence Internal|UI|CarouselItem")
 	int GetIndex();
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence Internal|UI|CarouselItem")
 	float GetTargetX();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI|CarouselItem")
 	void Move(int indexParam, float targetXParam);
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, Category = "Emergence Internal|UI|CarouselItem")
 	void OnMove(int indexParam, bool left, bool immediate);
 
 private:

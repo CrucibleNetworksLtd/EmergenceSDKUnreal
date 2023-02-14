@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -17,11 +17,11 @@ class EMERGENCE_API UEmergenceTopBarComponent : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Emergence Internal|UI|Top Bar")
 	void StartGetBalanceTextAsync();
 
 	//returns false if the balance shouldn't be shown
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category="Emergence Internal|UI|Top Bar")
 	bool ShouldDisplayBalanceText();
 
 	UFUNCTION()
@@ -33,14 +33,14 @@ public:
 	UFUNCTION()
 	void SymbolResponseHandler(FJsonObjectWrapper Response, EErrorCode StatusCode);
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category="Emergence Internal|UI|Top Bar")
 	FString GetBalanceText();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, Category="Emergence Internal|UI|Top Bar")
 	void BalanceTextUpdated();
 
 protected:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category="Emergence Internal|UI|Top Bar")
 	FString CurrencyDisplayText = "";
 
 private:

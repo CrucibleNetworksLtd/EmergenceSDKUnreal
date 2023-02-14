@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 using UnrealBuildTool;
 
@@ -29,6 +29,7 @@ public class EmergenceEditorMethodGraphPin : ModuleRules
 			"Emergence"
 			}
 		);
+
+		PublicDefinitions.Add("UNREAL_MARKETPLACE_BUILD=1");
 	}
-	
 }

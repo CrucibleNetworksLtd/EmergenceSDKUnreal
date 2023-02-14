@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -25,16 +25,16 @@ struct FEmergenceInventoryFilterSetCategories
 
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Filtering|Categories")
     bool Avatars = true;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Filtering|Categories")
     bool Props = true;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Filtering|Categories")
     bool Clothing = true;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Filtering|Categories")
     bool Weapons = true;
 };
 
@@ -44,14 +44,14 @@ struct FEmergenceInventoryFilterSet
 
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "UseSearch"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "UseSearch"), Category = "Emergence|Inventory Service|Filtering")
     FString Search = "";
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ShowInnerProperties, EditCondition = "UseCategories"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ShowInnerProperties, EditCondition = "UseCategories"), Category = "Emergence|Inventory Service|Filtering")
     FEmergenceInventoryFilterSetCategories Categories;
 
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "UseBlockchain"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "UseBlockchain"), Category = "Emergence|Inventory Service|Filtering")
     EEmergenceInventoryBlockchain Blockchain;
 
 };
@@ -61,18 +61,18 @@ class UInventoryScreen : public UEmergenceScreen
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Emergence Internal|Inventory Service|UI")
 	FEmergenceInventoryFilterSet Filters;
 
     DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemSelected, FEmergenceCombinedInventoryItem, Item);
 
-    UPROPERTY(BlueprintCallable, BlueprintAssignable)
+    UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Emergence Internal|Inventory Service|UI")
     FOnItemSelected OnItemSelected;
 
-    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Meta = (ExposeOnSpawn = true))
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Meta = (ExposeOnSpawn = true), Category = "Emergence Internal|Inventory Service|UI")
     FString Address = "0xc33411F5dAE18253AB23068B700B5a0c9C44DA2C";
 
     //Shows a message on the inventory to inform the user that the inventory they are view is not theirs
-    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Meta = (ExposeOnSpawn = true))
+    UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Meta = (ExposeOnSpawn = true), Category = "Emergence Internal|Inventory Service|UI")
     bool ShowExternalInventoryMessage = false;
 };

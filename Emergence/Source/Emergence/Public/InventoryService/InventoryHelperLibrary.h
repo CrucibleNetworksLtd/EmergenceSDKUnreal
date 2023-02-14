@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -13,14 +13,14 @@ struct FEmergenceCombinedInventoryItem
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FEmergenceInventoryItem InventoryItem;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Inventory Service|Combined Inventory Item")
+	FEmergenceInventoryItem InventoryItem;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FEmergenceAvatarResult AvatarItem;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Inventory Service|Combined Inventory Item")
+	FEmergenceAvatarResult AvatarItem;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool HasMatchingAvatar = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Inventory Service|Combined Inventory Item")
+	bool HasMatchingAvatar = false;
 };
 
 UCLASS()

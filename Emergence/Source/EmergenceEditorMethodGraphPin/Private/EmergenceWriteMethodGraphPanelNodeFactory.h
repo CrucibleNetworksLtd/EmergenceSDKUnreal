@@ -1,3 +1,4 @@
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -16,8 +17,15 @@ class FEmergenceWriteMethodGraphPanelNodeFactory: public FGraphPanelNodeFactory
 
 			return nullptr;
 		}
-
+#if UNREAL_MARKETPLACE_BUILD
+		if ("Load Contract" == Node->GetNodeTitle(ENodeTitleType::FullTitle).ToString() ||
+		"Create Key Store File" == Node->GetNodeTitle(ENodeTitleType::FullTitle).ToString() ||
+		"Create Wallet and Key Store File" == Node->GetNodeTitle(ENodeTitleType::FullTitle).ToString() ||
+		"Load Account from Key Store File" == Node->GetNodeTitle(ENodeTitleType::FullTitle).ToString()
+		) {
+#else
 		if ("Load Contract" == Node->GetNodeTitle(ENodeTitleType::FullTitle).ToString()) {
+#endif
 			Node->SetEnabledState(ENodeEnabledState::Disabled, false);
 			Node->SetForceDisplayAsDisabled(true);
 			return nullptr;

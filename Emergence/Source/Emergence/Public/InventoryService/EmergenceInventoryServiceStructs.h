@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -14,22 +14,22 @@ struct FEmergenceInventoryItemsMetaContent
 
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Content")
     FString url;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Content")
     FString representation;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Content")
     FString mimeType;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Content")
     int32 size;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Content")
     int32 width;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Content")
     int32 height;
 
     FEmergenceInventoryItemsMetaContent() {};
@@ -69,10 +69,10 @@ struct FEmergenceInventoryItemsMetaAttribute
 
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Attribute")
     FString key;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Attribute")
     FString value;
 
     FEmergenceInventoryItemsMetaAttribute() {};
@@ -104,19 +104,19 @@ struct FEmergenceInventoryItemMeta
 
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta")
     FString name;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta")
     FString description;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta")
     TArray<FEmergenceInventoryItemsMetaAttribute> attributes;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta")
     TArray<FEmergenceInventoryItemsMetaContent> content;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta")
     FString dynamicMetadata;
 
     FEmergenceInventoryItemMeta() {};
@@ -154,11 +154,11 @@ struct FEmergenceInventoryItemCreator
 
     GENERATED_BODY()
 
-        UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FString account;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Creator")
+    FString account;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        int32 value;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Creator")
+    int32 value;
 
     FEmergenceInventoryItemCreator() {};
 
@@ -189,41 +189,41 @@ struct FEmergenceInventoryItem
 
     GENERATED_BODY()
 
-        UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FString id;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FString id;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FString blockchain;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FString blockchain;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FString contract;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FString contract;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FString tokenId;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FString tokenId;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        TArray<FEmergenceInventoryItemCreator> creators;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    TArray<FEmergenceInventoryItemCreator> creators;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FString lazySupply;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FString lazySupply;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FString mintedAt;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FString mintedAt;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FString lastUpdatedAt;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FString lastUpdatedAt;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FString supply;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FString supply;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FEmergenceInventoryItemMeta meta;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FEmergenceInventoryItemMeta meta;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        bool deleted;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    bool deleted;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-        FString totalStock;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FString totalStock;
 
     FEmergenceInventoryItem() {};
 
@@ -274,7 +274,7 @@ struct FEmergenceInventory
 
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service")
     TArray<FEmergenceInventoryItem> items;
 
     FEmergenceInventory() {};

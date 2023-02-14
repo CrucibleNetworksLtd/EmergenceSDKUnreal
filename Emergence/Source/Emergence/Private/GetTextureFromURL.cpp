@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 
 #include "GetTextureFromURL.h"
@@ -9,6 +9,7 @@
 #include "IImageWrapper.h"
 #include "Dom/JsonObject.h"
 #include "EmergenceSingleton.h"
+#include "TimerManager.h"
 
 void UGetTextureFromUrl::Activate()
 {

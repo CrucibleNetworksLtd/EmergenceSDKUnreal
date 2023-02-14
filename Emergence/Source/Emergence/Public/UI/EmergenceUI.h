@@ -1,4 +1,4 @@
-// Copyright Crucible Networks Ltd 2022. All Rights Reserved.
+// Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #pragma once
 
@@ -31,18 +31,18 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence UI")
 	FOnScreenSwitched OnScreenSwitched;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI")
 	void SetUserHasLoggedInBefore(bool HasLoggedInBefore);
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence Internal|UI")
 	bool GetUserHasLoggedInBefore();
 
 	//Switches the active screen to a new widget object
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI")
 	void SwitchCurrentScreen(UUserWidget* NewScreen);
 
 	//Switches the active screen to a new widget class
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI")
 	void SwitchCurrentScreenByClass(TSubclassOf<UUserWidget> NewScreenClass);
 
 	//The current screen slot sub-component. This is a C++ "BindWidget"'d widget, DO NOT RENAME IN UMG BLUEPRINTS!
@@ -50,36 +50,36 @@ public:
 	UNamedSlot* CurrentScreenSlotBoundWidget;
 
 	//Adds a message with the given Id to the LoadingMessages table
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI")
 	void ShowLoadingMessage(FName MessageId, FText Reason);
 
 	//Removes the message with the given Id from the LoadingMessages table
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI")
 	void HideLoadingMessage(FName MessageId);
 
 	//Gets the most recent loading message
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence Internal|UI")
 	bool GetMostRecentLoadingMessage(FText& Message);
 
 	//Shows an error code for the given error
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Emergence Internal|UI")
 	void ShowServerErrorMessage(const EErrorCode& ErrorCode);
 
 	//Closes the EmergenceUI.
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI")
 	void Close();
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClosed);
 
 	//Called when the UI is closed.
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, Category = "Emergence Internal|UI")
 	FOnClosed Closed;
 
 	//Called when the UI reaches the home screen.
-	UPROPERTY(BlueprintCallable, BlueprintAssignable)
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Emergence Internal|UI")
 	FOnClosed OpeningFinished;
 
 	//Gets the default avatar icon from the plugin settings
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Emergence Internal|UI")
 	static TSoftObjectPtr<UTexture2D> GetDefaultAvatarIcon();
 };
