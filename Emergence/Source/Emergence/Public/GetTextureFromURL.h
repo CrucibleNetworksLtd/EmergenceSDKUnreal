@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -12,7 +12,7 @@
 /**
  */
 UCLASS()
-class EMERGENCE_API UGetTextureFromUrl : public UBlueprintAsyncActionBase
+class EMERGENCE_API UGetTextureFromUrl : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -47,7 +47,7 @@ private:
 	
 	FString Url;
 	bool AllowCacheUsage;
-	UObject* WorldContextObject;
+	
 	FTimerHandle Timer;
 	UTexture2D** CachedTexturePtr;
 };

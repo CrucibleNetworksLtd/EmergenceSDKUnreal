@@ -33,6 +33,16 @@ void UReadMethod::LoadContractCompleted(FString Response, EErrorCode StatusCode)
 
 void UReadMethod::Activate()
 {
+	if (!DeployedContract) {
+		UE_LOG(LogEmergenceHttp, Error, TEXT("You need a Deployed Contract to use ReadMethod!"));
+		return;
+	}
+
+	if (!WorldContextObject) {
+		UE_LOG(LogEmergenceHttp, Error, TEXT("You need a WorldContextObject to use ReadMethod!"));
+		return;
+	}
+
 	UEmergenceSingleton* Singleton = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
 	//if this contract has never had its ABI loaded...
 	if (!Singleton->ContractsWithLoadedABIs.Contains(DeployedContract->Blockchain->Name.ToString() + DeployedContract->Address)) {

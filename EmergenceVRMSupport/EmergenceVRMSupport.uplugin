@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.3.0",
+	"VersionName": "0.3.2",
 	"FriendlyName": "Emergence VRM Support",
 	"Description": "",
 	"Category": "Metaverse",
@@ -15,6 +15,12 @@
 	"IsBetaVersion": true,
 	"IsExperimentalVersion": false,
 	"Installed": false,
+	"bHasExplicitPlatforms": true,
+	"SupportedTargetPlatforms": [
+		"Win64",
+		"Win32",
+		"Mac"
+	],
 	"Modules": [
 		{
 			"Name": "EmergenceVRMSupport",
@@ -23,10 +29,6 @@
 		}
 	],
 	"Plugins": [
-		{
-			"Name": "Emergence",
-			"Enabled": true
-		},
 		{
 			"Name": "VRM4U",
 			"Enabled": true

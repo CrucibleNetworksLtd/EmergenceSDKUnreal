@@ -8,20 +8,12 @@ public class Emergence : ModuleRules
 	{
 		bool MarketplaceBuild = false;
 		
-		if(MarketplaceBuild){
+		if(MarketplaceBuild || Target.Platform == UnrealTargetPlatform.Mac){
 			PublicDefinitions.Add("UNREAL_MARKETPLACE_BUILD=1");
 		}
 		else{
 			PublicDefinitions.Add("UNREAL_MARKETPLACE_BUILD=0");
-			if(Target.Platform == UnrealTargetPlatform.Win64)
-			{
-				RuntimeDependencies.Add("$(BinaryOutputDir)", "$(PluginDir)/EmergenceServer/Windows/...");
-			}
-			
-			if(Target.Platform == UnrealTargetPlatform.Mac)
-			{
-				RuntimeDependencies.Add("$(BinaryOutputDir)", "$(PluginDir)/EmergenceServer/Mac/...");
-			}
+			RuntimeDependencies.Add("$(BinaryOutputDir)", "$(PluginDir)/EmergenceServer/Windows/...");
 		}
 		
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;

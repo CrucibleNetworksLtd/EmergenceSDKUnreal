@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -12,7 +12,7 @@
 #include "WriteMethod.generated.h"
 
 UCLASS()
-class EMERGENCE_API UWriteMethod : public UBlueprintAsyncActionBase
+class EMERGENCE_API UWriteMethod : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -45,10 +45,11 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnTransactionSent OnTransactionSent;
 
-	
+	UFUNCTION()
+	void CallWriteMethod();
 private:
 	void WriteMethod_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	UObject* WorldContextObject;
+	
 	UEmergenceDeployment* DeployedContract;
 	FEmergenceContractMethod MethodName;
 	TArray<FString> Content;

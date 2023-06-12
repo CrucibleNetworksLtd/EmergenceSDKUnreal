@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -11,7 +11,7 @@
 #include "GetAvatar.generated.h"
 
 UCLASS()
-class EMERGENCE_API UGetAvatar : public UBlueprintAsyncActionBase
+class EMERGENCE_API UGetAvatar : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -33,7 +33,7 @@ private:
 
 	UFUNCTION()
 	void AvatarReturned(UTexture2D* Texture, EErrorCode StatusCode);
-	UObject* WorldContextObject;
+	
 	FString ImageMetadataURI;
 	FString ERC721Name;
 	int TokenId;

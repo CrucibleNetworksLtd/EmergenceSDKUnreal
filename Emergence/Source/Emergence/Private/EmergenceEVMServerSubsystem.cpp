@@ -4,10 +4,13 @@
 #include "EmergenceEVMServerSubsystem.h"
 #include "LocalEmergenceServer.h"
 #include "HttpService/HttpHelperLibrary.h"
+#include "EmergenceSingleton.h"
+#include "HttpModule.h"
+#include "HttpManager.h"
 
 void UEmergenceEVMServerSubsystem::Initialize(FSubsystemCollectionBase& Collection) {
 #if UNREAL_MARKETPLACE_BUILD
-	UHttpHelperLibrary::APIBase = "https://evm.openmeta.xyz/api/";
+	UHttpHelperLibrary::APIBase = "https://evm2.openmeta.xyz/api/";
 #else
 	bool LaunchHidden = true;
 	if (GConfig) {
@@ -18,7 +21,15 @@ void UEmergenceEVMServerSubsystem::Initialize(FSubsystemCollectionBase& Collecti
 }
 
 void UEmergenceEVMServerSubsystem::Deinitialize() {
+
+	for (FHttpRequestRef Request : ActiveRequests) {
+		Request->OnProcessRequestComplete().Unbind();
+		Request->CancelRequest();		
+	}
+
 #if !UNREAL_MARKETPLACE_BUILD
 	ULocalEmergenceServer::KillLocalServerProcess();
+#else
+	UEmergenceSingleton::GetEmergenceManager(GetGameInstance())->KillSession();
 #endif
 }

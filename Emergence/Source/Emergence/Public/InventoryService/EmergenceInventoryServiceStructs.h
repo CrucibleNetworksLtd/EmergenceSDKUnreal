@@ -24,13 +24,13 @@ struct FEmergenceInventoryItemsMetaContent
     FString mimeType;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Content")
-    int32 size;
+    int32 size = -1;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Content")
-    int32 width;
+    int32 width = -1;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Meta|Content")
-    int32 height;
+    int32 height = -1;
 
     FEmergenceInventoryItemsMetaContent() {};
 
@@ -158,7 +158,7 @@ struct FEmergenceInventoryItemCreator
     FString account;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item|Creator")
-    int32 value;
+    int32 value = -1;
 
     FEmergenceInventoryItemCreator() {};
 
@@ -220,7 +220,7 @@ struct FEmergenceInventoryItem
     FEmergenceInventoryItemMeta meta;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
-    bool deleted;
+    bool deleted = false;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
     FString totalStock;

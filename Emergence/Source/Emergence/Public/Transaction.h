@@ -18,7 +18,7 @@ struct FEmergenceTransaction
 
   //The transaction type.
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Transaction")
-  int Type;
+  int Type = -1;
 
   //Array of log objects, which this transaction generated.
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Transaction")
@@ -26,7 +26,7 @@ struct FEmergenceTransaction
 
   //either 1 (success) or 0 (failure).
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Transaction")
-  bool Status;
+  bool Status = false;
 
   //If this transaction was to create a contract address, then this will be the address of the newly create contract, otherwise will be null.
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Transaction")
@@ -74,7 +74,7 @@ struct FEmergenceTransaction
 
   //The amount of confirmations (chain's current block number - this transaction's block number).
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Transaction")
-  int Confirmations;
+  int Confirmations = -1;
 
   FEmergenceTransaction() {};
 

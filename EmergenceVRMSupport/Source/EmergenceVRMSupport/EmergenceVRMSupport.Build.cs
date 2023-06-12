@@ -12,11 +12,6 @@ public class EmergenceVRMSupport : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[] {
 				"Core",
-				"UMG",
-				"Sockets",
-				"Networking",
-				"JsonUtilities",
-				"Emergence",
 				"VRM4U",
 				"VRM4ULoader"
 			}
@@ -26,9 +21,7 @@ public class EmergenceVRMSupport : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[] {
 				"CoreUObject",
-				"Engine",
-				"HTTP",
-				"Json"
+				"Engine"
 			}
 		);
 	}

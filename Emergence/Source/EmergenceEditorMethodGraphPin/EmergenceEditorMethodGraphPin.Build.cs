@@ -8,6 +8,7 @@ public class EmergenceEditorMethodGraphPin : ModuleRules
 	{
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+
         PrivateDependencyModuleNames.AddRange(
 			new string[] {
                 "Core",
@@ -29,7 +30,5 @@ public class EmergenceEditorMethodGraphPin : ModuleRules
 			"Emergence"
 			}
 		);
-
-		PublicDefinitions.Add("UNREAL_MARKETPLACE_BUILD=1");
 	}
 }

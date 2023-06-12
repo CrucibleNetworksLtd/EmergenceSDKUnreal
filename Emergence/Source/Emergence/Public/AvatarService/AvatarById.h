@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -16,7 +16,7 @@
 
 
 UCLASS()
-class EMERGENCE_API UAvatarById : public UBlueprintAsyncActionBase
+class EMERGENCE_API UAvatarById : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -37,5 +37,4 @@ private:
 	void AvatarById_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 
 	FString AvatarIdString;
-	UObject* WorldContextObject;
 };

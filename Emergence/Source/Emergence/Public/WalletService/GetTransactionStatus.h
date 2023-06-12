@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -12,7 +12,7 @@
 #include "GetTransactionStatus.generated.h"
 
 UCLASS()
-class EMERGENCE_API UGetTransactionStatus : public UBlueprintAsyncActionBase
+class EMERGENCE_API UGetTransactionStatus : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -32,7 +32,7 @@ public:
 	FOnGetTransactionStatusCompleted OnGetTransactionStatusCompleted;
 private:
 	void GetTransactionStatus_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	UObject* WorldContextObject;
+	
 	FString TransactionHash;
 	UEmergenceChain* Blockchain;
 };

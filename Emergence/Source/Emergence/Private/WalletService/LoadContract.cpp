@@ -7,6 +7,7 @@
 ULoadContract* ULoadContract::LoadContract(UObject* WorldContextObject, FString ContractAddress, FString ABI)
 {
 	ULoadContract* BlueprintNode = NewObject<ULoadContract>();
+	BlueprintNode->WorldContextObject;
 	return BlueprintNode;
 }
 

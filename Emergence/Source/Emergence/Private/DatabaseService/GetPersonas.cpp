@@ -33,21 +33,23 @@ void UGetPersonas::Activate()
 
 void UGetPersonas::GetPersonas_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
 {
-	EErrorCode StatusCode;
-	FJsonObject JsonObject = UErrorCodeFunctionLibrary::TryParseResponseAsJson(HttpResponse, bSucceeded, StatusCode);
-	if (StatusCode == EErrorCode::EmergenceOk) {
-		FEmergencePersonaListResponse ResponceStruct = FEmergencePersonaListResponse(*HttpResponse->GetContentAsString());
-		OnGetPersonasCompleted.Broadcast(ResponceStruct, EErrorCode::EmergenceOk);
-		
-		for (int i = 0; i < ResponceStruct.personas.Num(); i++) {
-			if (ResponceStruct.personas[i].id == ResponceStruct.selected) {
-				UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->SetCachedCurrentPersona(ResponceStruct.personas[i]);
+	if (WorldContextObject) {
+		EErrorCode StatusCode;
+		FJsonObject JsonObject = UErrorCodeFunctionLibrary::TryParseResponseAsJson(HttpResponse, bSucceeded, StatusCode);
+		if (StatusCode == EErrorCode::EmergenceOk) {
+			FEmergencePersonaListResponse ResponceStruct = FEmergencePersonaListResponse(*HttpResponse->GetContentAsString());
+			OnGetPersonasCompleted.Broadcast(ResponceStruct, EErrorCode::EmergenceOk);
+
+			for (int i = 0; i < ResponceStruct.personas.Num(); i++) {
+				if (ResponceStruct.personas[i].id == ResponceStruct.selected) {
+					UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->SetCachedCurrentPersona(ResponceStruct.personas[i]);
+				}
 			}
 		}
-	}
-	else {
-		OnGetPersonasCompleted.Broadcast(FEmergencePersonaListResponse(), StatusCode);
-		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("GetPersonas", StatusCode);
+		else {
+			OnGetPersonasCompleted.Broadcast(FEmergencePersonaListResponse(), StatusCode);
+			UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("GetPersonas", StatusCode);
+		}
 	}
 	SetReadyToDestroy();
 }

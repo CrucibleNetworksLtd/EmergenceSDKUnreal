@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -12,7 +12,7 @@
 /**
  */
 UCLASS()
-class EMERGENCE_API UGetDataFromUrl : public UBlueprintAsyncActionBase
+class EMERGENCE_API UGetDataFromUrl : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -38,5 +38,5 @@ private:
 	void GetDataFromUrl_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 
 	FString Url;
-	UObject* WorldContextObject;
+	
 };

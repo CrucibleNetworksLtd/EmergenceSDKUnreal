@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -12,7 +12,7 @@
 #include "GetBlockNumber.generated.h"
 
 UCLASS()
-class EMERGENCE_API UGetBlockNumber : public UBlueprintAsyncActionBase
+class EMERGENCE_API UGetBlockNumber : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -31,6 +31,6 @@ public:
 	FOnGetBlockNumberCompleted OnGetBlockNumberCompleted;
 private:
 	void GetBlockNumber_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	UObject* WorldContextObject;
+	
 	UEmergenceChain* Blockchain;
 };

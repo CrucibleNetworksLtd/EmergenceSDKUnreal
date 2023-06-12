@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -11,7 +11,7 @@
 #include "CreateKeyStoreFile.generated.h"
 
 UCLASS()
-class EMERGENCE_API UCreateKeyStoreFile : public UBlueprintAsyncActionBase
+class EMERGENCE_API UCreateKeyStoreFile : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:

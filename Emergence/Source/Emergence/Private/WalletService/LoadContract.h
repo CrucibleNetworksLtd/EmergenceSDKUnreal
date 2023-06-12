@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "ErrorCodeFunctionLibrary.h"
 #include "LoadContract.generated.h"
 
 UCLASS()
-class EMERGENCE_API ULoadContract : public UBlueprintAsyncActionBase
+class EMERGENCE_API ULoadContract : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:

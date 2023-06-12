@@ -47,8 +47,13 @@ void UAvatarByOwner::AvatarByOwner_HttpRequestComplete(FHttpRequestPtr HttpReque
 
 		for (int i = 0; i < JsonObject.GetArrayField("message").Num(); i++) {
 			FString TokenURI = JsonObject.GetArrayField("message")[i].Get()->AsObject().Get()->GetStringField("tokenURI");
-			auto Request = UHttpHelperLibrary::ExecuteHttpRequest<UAvatarByOwner>(this, &UAvatarByOwner::GetMetadata_HttpRequestComplete, TokenURI);
-			Requests.Add(TPair<FHttpRequestRef, FEmergenceAvatarResult>(Request, Results[i]));
+			if (!TokenURI.IsEmpty()) {
+				auto Request = UHttpHelperLibrary::ExecuteHttpRequest<UAvatarByOwner>(this, &UAvatarByOwner::GetMetadata_HttpRequestComplete, TokenURI);
+				Requests.Add(TPair<FHttpRequestRef, FEmergenceAvatarResult>(Request, Results[i]));
+			}
+			else {
+				UE_LOG(LogEmergenceHttp, Warning, TEXT("One of the Avatar's TokenURI was blank in the AvatarByOwner, ignoring it."));
+			}
 		}
 		return;
 	}

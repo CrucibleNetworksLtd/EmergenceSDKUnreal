@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "InventoryService/EmergenceInventoryServiceStructs.h"
 #include "InventoryService/InventoryScreen.h"
 #include "OpenNFTPicker.generated.h"
@@ -18,7 +18,7 @@ enum class EEmergenceNFTPickerError : uint8 {
 };
 
 UCLASS()
-class EMERGENCE_API UOpenNFTPicker : public UBlueprintAsyncActionBase
+class EMERGENCE_API UOpenNFTPicker : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -61,5 +61,5 @@ private:
 	UInventoryScreen* InventoryScreen;
 	UEmergenceUI* EmergenceUI;
 	FString OverrideAddress;
-	UObject* WorldContextObject;
+	
 };

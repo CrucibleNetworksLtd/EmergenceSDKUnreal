@@ -22,9 +22,9 @@ void URequestToSign::Activate()
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>("Content-Type", "application/json"));
 	Headers.Add(TPair<FString, FString>("accept", "text/plain"));
-
-	if (!UEmergenceSingleton::DeviceID.IsEmpty()) { //we need to send the device ID if we have one, we won't have one for local EVM servers
-		Headers.Add(TPair<FString, FString>("deviceId",UEmergenceSingleton::DeviceID));
+	auto Singleton = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
+	if (!Singleton->DeviceID.IsEmpty()) { //we need to send the device ID if we have one, we won't have one for local EVM servers
+		Headers.Add(TPair<FString, FString>("deviceId", Singleton->DeviceID));
 	}
 
 	UHttpHelperLibrary::ExecuteHttpRequest<URequestToSign>(this, &URequestToSign::RequestToSign_HttpRequestComplete, UHttpHelperLibrary::APIBase + "request-to-sign", "POST", 60.0F, Headers, Content);

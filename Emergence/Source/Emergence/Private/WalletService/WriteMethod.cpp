@@ -7,6 +7,7 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "EmergenceSingleton.h"
 #include "WalletService/LoadContractInternal.h"
+#include "Templates/SharedPointer.h"
 
 UWriteMethod* UWriteMethod::WriteMethod(UObject* WorldContextObject, UEmergenceDeployment* DeployedContract, FEmergenceContractMethod MethodName, FString Value, TArray<FString> Content, FString LocalAccountName, FString GasPrice, int NumberOfConfirmations, float TimeBetweenChecks)
 {
@@ -36,7 +37,24 @@ void UWriteMethod::LoadContractCompleted(FString Response, EErrorCode StatusCode
 
 void UWriteMethod::Activate()
 {
+	if (!DeployedContract) {
+		UE_LOG(LogEmergenceHttp, Error, TEXT("You need a Deployed Contract to use WriteMethod!"));
+		return;
+	}
+
+	if (!WorldContextObject) {
+		UE_LOG(LogEmergenceHttp, Error, TEXT("You need a WorldContextObject to use WriteMethod!"));
+		return;
+	}
+
 	UEmergenceSingleton* Singleton = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
+
+	if (this->LocalAccountName.IsEmpty() && !Singleton->HasAccessToken()) {
+		UE_LOG(LogEmergenceHttp, Error, TEXT("If you aren't using a local wallet you need to have connected with WalletConnect to use WriteMethod!"));
+		return;
+	}
+
+	
 	//if this contract has never had its ABI loaded...
 	if (!Singleton->ContractsWithLoadedABIs.Contains(DeployedContract->Blockchain->Name.ToString() + DeployedContract->Address)) {
 		ULoadContractInternal* LoadContract = ULoadContractInternal::LoadContract(WorldContextObject, DeployedContract);
@@ -45,10 +63,66 @@ void UWriteMethod::Activate()
 		return;
 	}
 
-	TArray<TPair<FString, FString>> Headers;
+	//if we're working with a wallet connected wallet
+	if (this->LocalAccountName.IsEmpty()) {
+		TArray<TPair<FString, FString>> SwitchChainHeaders;
 
-	if (!UEmergenceSingleton::DeviceID.IsEmpty()) { //we need to send the device ID if we have one, we won't have one for local EVM servers
-		Headers.Add(TPair<FString, FString>("deviceId", UEmergenceSingleton::DeviceID));
+		if (!Singleton->DeviceID.IsEmpty()) { //we need to send the device ID if we have one, we won't have one for local EVM servers
+			SwitchChainHeaders.Add(TPair<FString, FString>("deviceId", Singleton->DeviceID));
+		}
+		SwitchChainHeaders.Add(TPair<FString, FString>{"Content-Type", "application/json"});
+
+		TSharedPtr<FJsonObject> SwitchChainContent = MakeShareable(new FJsonObject);
+		SwitchChainContent->SetNumberField("chainId", DeployedContract->Blockchain->ChainID);
+		SwitchChainContent->SetStringField("chainName", DeployedContract->Blockchain->Name.ToString());
+		SwitchChainContent->SetStringField("currencyName", DeployedContract->Blockchain->Symbol);
+		SwitchChainContent->SetStringField("currencySymbol", DeployedContract->Blockchain->Symbol);
+		SwitchChainContent->SetNumberField("currencyDecimals", 18);
+		SwitchChainContent->SetArrayField("rpcUrls", { MakeShared<FJsonValueString>(DeployedContract->Blockchain->NodeURL) });
+		SwitchChainContent->SetArrayField("blockExplorerUrls", {});
+		FString SwitchChainContentString;
+		TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&SwitchChainContentString);
+		FJsonSerializer::Serialize(SwitchChainContent.ToSharedRef(), Writer);
+
+		//call switchChain to make sure we're on the right chain
+		auto Request = UHttpHelperLibrary::ExecuteHttpRequest<UWriteMethod>(
+			this,
+			nullptr,
+			UHttpHelperLibrary::APIBase + "switchChain",
+			"POST",
+			300.0F, //give the user lots of time to mess around setting high gas fees
+			SwitchChainHeaders,
+			SwitchChainContentString, false);
+		Request->OnProcessRequestComplete().BindLambda([&](FHttpRequestPtr req, FHttpResponsePtr res, bool bSucceeded) {
+			EErrorCode StatusCode;
+			FJsonObject JsonObject = UErrorCodeFunctionLibrary::TryParseResponseAsJson(res, bSucceeded, StatusCode);
+			UE_LOG(LogEmergenceHttp, Display, TEXT("SwitchChain_HttpRequestComplete: %s"), *res->GetContentAsString());
+			if (StatusCode == EErrorCode::EmergenceOk) {
+				CallWriteMethod();
+				return;
+			}
+			else {
+				this->OnTransactionConfirmed.Broadcast(FEmergenceTransaction(), StatusCode);
+				return;
+			}
+		});
+		Request->ProcessRequest();
+		UE_LOG(LogEmergenceHttp, Display, TEXT("SwitchChain request started on method %s with value %s, calling lambda function on request completed. Json sent as part of the request: "), *MethodName.MethodName, *Value);
+		UE_LOG(LogEmergenceHttp, Display, TEXT("%s"), *SwitchChainContentString);
+	}
+	//if we're working with a local wallet 
+	else {
+		//switching networks isn't allowed
+		CallWriteMethod();
+	}
+}
+
+void UWriteMethod::CallWriteMethod()
+{
+	TArray<TPair<FString, FString>> Headers;
+	UEmergenceSingleton* Singleton = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
+	if (!Singleton->DeviceID.IsEmpty()) { //we need to send the device ID if we have one, we won't have one for local EVM servers
+		Headers.Add(TPair<FString, FString>("deviceId", Singleton->DeviceID));
 	}
 	Headers.Add(TPair<FString, FString>{"Content-Type", "application/json"});
 
@@ -68,8 +142,8 @@ void UWriteMethod::Activate()
 	}
 
 	UHttpHelperLibrary::ExecuteHttpRequest<UWriteMethod>(
-		this, 
-		&UWriteMethod::WriteMethod_HttpRequestComplete, 
+		this,
+		&UWriteMethod::WriteMethod_HttpRequestComplete,
 		UHttpHelperLibrary::APIBase + "writeMethod?contractAddress=" + DeployedContract->Address + "&nodeUrl=" + DeployedContract->Blockchain->NodeURL + "&network=" + DeployedContract->Blockchain->Name.ToString().Replace(TEXT(" "), TEXT("")) + "&methodName=" + MethodName.MethodName + "&value=" + Value + (LocalAccountName != "" ? "&localAccountName=" + LocalAccountName : "") + GasString,
 		"POST",
 		300.0F, //give the user lots of time to mess around setting high gas fees

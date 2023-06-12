@@ -44,6 +44,7 @@ void UGetTextureFromUrl::GetTextureFromUrl_HttpRequestComplete(FHttpRequestPtr H
 	//Checking for GIFs
 	if (ResponceBytes.Num() > 0) { //if its not empty
 		if (ResponceBytes[0] == 0x47 && ResponceBytes[1] == 0x49 && ResponceBytes[2] == 0x46) { //this is a GIF
+#if PLATFORM_WINDOWS
 			UE_LOG(LogEmergenceHttp, Display, TEXT("Found a GIF after GetTextureFromURL, sending for conversion..."));
 			TArray<TPair<FString, FString>> Headers;
 			Headers.Add(TPair<FString, FString>("Content-Type", "multipart/form-data; boundary=EmergenceBoundary"));
@@ -68,13 +69,19 @@ void UGetTextureFromUrl::GetTextureFromUrl_HttpRequestComplete(FHttpRequestPtr H
 			Request->SetContent(data);
 			Request->ProcessRequest();
 			return; //don't continue, we'll handle all the conversions once ConvertGIFtoPNG_HttpRequestComplete returns
+#else
+			return;
+#endif
 		}
 	}
 
 	UTexture2D* QRCodeTexture;
 	if (RawDataToBrush(*(FString(TEXT("QRCODE"))), ResponceBytes, QRCodeTexture)) {
 		OnGetTextureFromUrlCompleted.Broadcast(QRCodeTexture, EErrorCode::EmergenceOk);
-		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->DownloadedImageCache.Add(this->Url, QRCodeTexture);
+		//if we still have a world context object
+		if (WorldContextObject) {
+			UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->DownloadedImageCache.Add(this->Url, QRCodeTexture);
+		}
 		return;
 	}
 	else {
@@ -85,13 +92,13 @@ void UGetTextureFromUrl::GetTextureFromUrl_HttpRequestComplete(FHttpRequestPtr H
 void UGetTextureFromUrl::ConvertGIFtoPNG_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
 {
 	EErrorCode ResponseCode = UErrorCodeFunctionLibrary::GetResponseErrors(HttpResponse, bSucceeded);
-	if (!bSucceeded) {
+	if (!bSucceeded || (ResponseCode != EErrorCode::Ok)) {
+		UE_LOG(LogEmergenceHttp, Display, TEXT("Failed to get converted GIF, reason number: %d"), (int)ResponseCode);
 		OnGetTextureFromUrlCompleted.Broadcast(nullptr, UErrorCodeFunctionLibrary::Conv_IntToErrorCode(HttpResponse->GetResponseCode()));
 		return;
 	}
 	UE_LOG(LogEmergenceHttp, Display, TEXT("Convert GIF to PNG returned, turning it into a texture..."));
 	TArray<uint8> ResponceBytes = HttpResponse->GetContent();
-	UE_LOG(LogEmergenceHttp, Display, TEXT("Content as string: %s"), *HttpResponse->GetContentAsString());
 	UTexture2D* QRCodeTexture;
 	if (RawDataToBrush(*(FString(TEXT("QRCODE"))), ResponceBytes, QRCodeTexture)) {
 		OnGetTextureFromUrlCompleted.Broadcast(QRCodeTexture, EErrorCode::EmergenceOk);

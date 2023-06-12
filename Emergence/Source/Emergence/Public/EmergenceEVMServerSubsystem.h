@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Interfaces/IHttpRequest.h"
 #include "EmergenceEVMServerSubsystem.generated.h"
 
 /**
@@ -16,4 +17,7 @@ class EMERGENCE_API UEmergenceEVMServerSubsystem : public UGameInstanceSubsystem
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
+
+	//holds a list of active requests for closing when the game ends
+	TArray<TSharedRef<IHttpRequest, ESPMode::ThreadSafe>> ActiveRequests;
 };

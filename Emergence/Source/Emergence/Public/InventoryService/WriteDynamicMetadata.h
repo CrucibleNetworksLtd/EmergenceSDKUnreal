@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -13,7 +13,7 @@
 
 
 UCLASS()
-class EMERGENCE_API UWriteDynamicMetadata : public UBlueprintAsyncActionBase
+class EMERGENCE_API UWriteDynamicMetadata : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -39,5 +39,5 @@ private:
 	void WriteDynamicMetadata_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 	FString AuthorizationHeader, Network, Contract, TokenID, Metadata;
 	bool OnlyUpdate;
-	UObject* WorldContextObject;
+	
 };

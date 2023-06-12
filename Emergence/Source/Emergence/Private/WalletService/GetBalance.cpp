@@ -13,6 +13,7 @@ UGetBalance* UGetBalance::GetBalance(UObject* WorldContextObject, FString Addres
 	UGetBalance* BlueprintNode = NewObject<UGetBalance>();
 	BlueprintNode->Address = Address;
 	BlueprintNode->Blockchain = Blockchain;
+	BlueprintNode->WorldContextObject = WorldContextObject;
 	BlueprintNode->RegisterWithGameInstance(WorldContextObject);
 	return BlueprintNode;
 }

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -12,7 +12,7 @@
 #include "ReadMethod.generated.h"
 
 UCLASS()
-class EMERGENCE_API UReadMethod : public UBlueprintAsyncActionBase
+class EMERGENCE_API UReadMethod : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -36,7 +36,7 @@ public:
 	FOnReadMethodCompleted OnReadMethodCompleted;
 private:
 	void ReadMethod_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	UObject* WorldContextObject;
+	
 	FEmergenceContractMethod MethodName;
 	UEmergenceDeployment* DeployedContract;
 	TArray<FString> Content;

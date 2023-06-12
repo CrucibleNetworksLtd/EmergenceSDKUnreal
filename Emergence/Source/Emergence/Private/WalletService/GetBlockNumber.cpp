@@ -27,7 +27,7 @@ void UGetBlockNumber::Activate()
 		UE_LOG(LogEmergenceHttp, Display, TEXT("GetBlockNumber request started with JSON, calling GetBlockNumber_HttpRequestComplete on request completed."));
 	}
 	else {
-		UE_LOG(LogEmergenceHttp, Error, TEXT("GetBlockNumber' blockchain input was null."));
+		UE_LOG(LogEmergenceHttp, Error, TEXT("GetBlockNumber's blockchain input was null."));
 		OnGetBlockNumberCompleted.Broadcast(-1, EErrorCode::EmergenceClientFailed);
 	}
 }

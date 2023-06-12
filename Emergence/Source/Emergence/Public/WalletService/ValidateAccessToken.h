@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -13,7 +13,7 @@
  * 
  */
 UCLASS()
-class EMERGENCE_API UValidateAccessToken : public UBlueprintAsyncActionBase
+class EMERGENCE_API UValidateAccessToken : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -32,6 +32,6 @@ public:
 	FOnValidateAccessTokenCompleted OnValidateAccessTokenCompleted;
 private:
 	void ValidateAccessToken_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
-	UObject* WorldContextObject;
+	
 	FString AccessToken;
 };

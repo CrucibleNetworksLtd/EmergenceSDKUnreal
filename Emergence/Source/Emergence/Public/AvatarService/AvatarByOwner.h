@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintAsyncActionBase.h"
+#include "EmergenceAsyncActionBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -31,13 +31,16 @@ struct FEmergenceAvatarMetadata
 	FString UriBase;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Metadata")
-	int32 MaxTotalSize;
+	int32 MaxTotalSize = -1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Metadata")
-	int32 MaxTotalVertices;
+	int32 MaxTotalVertices = -1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Metadata")
 	FString GUID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Avatar Service|Avatar Metadata")
+	FString MaterialType;
 
 	FEmergenceAvatarMetadata() {};
 
@@ -56,6 +59,7 @@ struct FEmergenceAvatarMetadata
 		MaxTotalSize = _tmpEmergenceAvatarMetadata.MaxTotalSize;
 		MaxTotalVertices = _tmpEmergenceAvatarMetadata.MaxTotalVertices;
 		GUID = _tmpEmergenceAvatarMetadata.GUID;
+		MaterialType = _tmpEmergenceAvatarMetadata.MaterialType;
 	};
 
 };
@@ -82,7 +86,7 @@ struct FEmergenceAvatarResult
   TArray<FEmergenceAvatarMetadata> Avatars;
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Result")
-  int32 lastUpdated;
+  int32 lastUpdated = -1;
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Emergence|Avatar Service|Avatar Result")
   FString chain;
@@ -126,7 +130,7 @@ struct FEmergenceAvatarResult
 };
 
 UCLASS()
-class EMERGENCE_API UAvatarByOwner : public UBlueprintAsyncActionBase
+class EMERGENCE_API UAvatarByOwner : public UEmergenceAsyncActionBase
 {
 	GENERATED_BODY()
 public:
@@ -148,7 +152,7 @@ private:
 
 	void GetMetadata_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 	FString Address;
-	UObject* WorldContextObject;
+	
 
 	TArray<TPair<FHttpRequestRef, FEmergenceAvatarResult>> Requests;
 	TArray<FEmergenceAvatarResult> Results;
