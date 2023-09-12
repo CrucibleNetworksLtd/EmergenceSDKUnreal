@@ -25,7 +25,7 @@ void UGetDynamicMetadata::Activate()
 	Headers.Add(TPair<FString, FString>{"Host", UHttpHelperLibrary::GetInventoryServiceHostURL()});
 	Headers.Add(TPair<FString, FString>{"Content-Type", "application/json"});
 
-	UHttpHelperLibrary::ExecuteHttpRequest<UGetDynamicMetadata>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UGetDynamicMetadata>(
 		this,
 		&UGetDynamicMetadata::GetDynamicMetadata_HttpRequestComplete,
 		requestURL);

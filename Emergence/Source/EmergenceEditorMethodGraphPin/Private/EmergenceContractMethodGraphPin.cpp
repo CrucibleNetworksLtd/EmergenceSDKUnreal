@@ -5,7 +5,6 @@
 #include "EdGraph/EdGraphSchema.h"
 #include "SNameComboBox.h"
 #include "ScopedTransaction.h"
-#include "SlateCore/Public/Widgets/SBoxPanel.h"
 #include "SGraphPin.h"
 #include "Templates/SharedPointer.h"
 

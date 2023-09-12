@@ -21,7 +21,7 @@ UEmergenceChain* UEmergenceChain::GetEmergenceChainDataFromConfig(const UObject*
     return Cast<UEmergenceChain>(StaticLoadObject(UEmergenceChain::StaticClass(), const_cast<UObject*>(Outer), TEXT("/Emergence/Chains/Polygon.Polygon")));
 }
 
-UEmergenceChain* UEmergenceChain::CreateEmergenceChain(FText _Name, FString _NodeURL, FString _Symbol, int _ChainID)
+UEmergenceChain* UEmergenceChain::CreateEmergenceChain(FText _Name, FString _NodeURL, FString _Symbol, int64 _ChainID)
 {
 	UEmergenceChain* EmergenceChain = NewObject<UEmergenceChain>(UEmergenceChain::StaticClass());
 	EmergenceChain->Name = _Name;

@@ -22,8 +22,8 @@ void UInventoryByOwner::Activate()
 	FString requestURL = UHttpHelperLibrary::GetInventoryServiceAPIURL() + "byOwner?address=" + Address + "&network=" + Network;
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Host", UHttpHelperLibrary::GetInventoryServiceHostURL()});
-
-	UHttpHelperLibrary::ExecuteHttpRequest<UInventoryByOwner>(
+	
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UInventoryByOwner>(
 		this,
 		&UInventoryByOwner::InventoryByOwner_HttpRequestComplete,
 		requestURL,

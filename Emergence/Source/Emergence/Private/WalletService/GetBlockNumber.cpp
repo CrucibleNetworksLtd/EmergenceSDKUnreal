@@ -20,7 +20,7 @@ UGetBlockNumber* UGetBlockNumber::GetBlockNumber(UObject* WorldContextObject, UE
 void UGetBlockNumber::Activate()
 {
 	if (Blockchain) {
-		UHttpHelperLibrary::ExecuteHttpRequest<UGetBlockNumber>(
+		Request = UHttpHelperLibrary::ExecuteHttpRequest<UGetBlockNumber>(
 			this,
 			&UGetBlockNumber::GetBlockNumber_HttpRequestComplete,
 			UHttpHelperLibrary::APIBase + "getBlockNumber?nodeURL=" + Blockchain->NodeURL);

@@ -20,7 +20,7 @@ void UGetPersonas::Activate()
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Authorization", UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->GetCurrentAccessToken()});
 
-	UHttpHelperLibrary::ExecuteHttpRequest<UGetPersonas>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UGetPersonas>(
 		this,
 		&UGetPersonas::GetPersonas_HttpRequestComplete,
 		UHttpHelperLibrary::GetPersonaAPIURL() + "personas",

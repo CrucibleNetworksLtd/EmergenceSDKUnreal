@@ -34,6 +34,10 @@ public:
 	UPROPERTY(config, EditAnywhere, Category = "General")
 	TSoftObjectPtr<UTexture2D> DefaultAvatarIcon = TSoftObjectPtr<UTexture2D>(FSoftObjectPath("Texture2D'/Emergence/Components/UE.UE'"));
 	
+	//Used to only show pre-defined collections in the inventory screen. They should be in the fomat "BLOCKCHAIN:0xaddress", such as "POLYGON:0x074534df6174759a5ae3ad81e3bcdfc0f940f6a6" (note the lower case on the address). Setting this to empty (0 elements) will turn off the whitelist.
+	UPROPERTY(config, EditAnywhere, Category = "General")
+	TArray<FString> InventoryScreenCollectionWhitelist = {};
+
 	//Should the overlay UI show the user's balance?
 	UPROPERTY(config, EditAnywhere, Category = "UI Overlay")
 	bool ShowBalance = true;
@@ -57,5 +61,13 @@ public:
 	//For Crucible use only! Shows the EVM server output window.
 	UPROPERTY(AdvancedDisplay, config, EditAnywhere, Category = "General", meta = (DisplayName = "[INTERNAL] Launch EVM server hidden"))
 	bool LaunchServerHidden = true;
-	
+
+
+	//If false, libcurl will be prevented from reusing connections. This can speed up requests on some systems. If you toggle this, you may have to restart the editor for it to fully have an effect.
+	UPROPERTY(config, EditAnywhere, Category = "libCurl", meta = (DisplayName = "Allow LibCurl Connection Reuse", EditCondition = "EngineHasConnectionReuseConfig", EditConditionHides, HideEditConditionToggle))
+	bool AllowLibcurlConnectionReuse = false;
+
+
+	UPROPERTY()
+	bool EngineHasConnectionReuseConfig = true;
 };

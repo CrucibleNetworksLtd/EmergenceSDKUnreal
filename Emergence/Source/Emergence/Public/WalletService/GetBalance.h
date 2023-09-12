@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EmergenceAsyncActionBase.h"
+#include "EmergenceAsyncSingleRequestBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -11,7 +11,7 @@
 #include "GetBalance.generated.h"
 
 UCLASS()
-class EMERGENCE_API UGetBalance : public UEmergenceAsyncActionBase
+class EMERGENCE_API UGetBalance : public UEmergenceAsyncSingleRequestBase
 {
 	GENERATED_BODY()
 public:

@@ -24,7 +24,7 @@ void UValidateSignedMessage::Activate()
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>("Content-Type", "application/json"));
 	Headers.Add(TPair<FString, FString>("accept", "text/plain"));
-	UHttpHelperLibrary::ExecuteHttpRequest<UValidateSignedMessage>(this, &UValidateSignedMessage::ValidateSignedMessage_HttpRequestComplete, UHttpHelperLibrary::APIBase + "validate-signed-message" + "?signedMessage=" + SignedMessage + "&address=" + Address, "POST", 60.0F, Headers, Content);
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UValidateSignedMessage>(this, &UValidateSignedMessage::ValidateSignedMessage_HttpRequestComplete, UHttpHelperLibrary::APIBase + "validate-signed-message" + "?signedMessage=" + SignedMessage + "&address=" + Address, "POST", 60.0F, Headers, Content);
 	UE_LOG(LogEmergenceHttp, Display, TEXT("ValidateSignedMessage request started, calling ValidateSignedMessage_HttpRequestComplete on request completed"));
 }
 

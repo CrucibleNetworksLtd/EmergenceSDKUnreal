@@ -21,7 +21,7 @@ void UAvatarById::Activate()
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Host", UHttpHelperLibrary::GetAvatarServiceHostURL()});
 
-	UHttpHelperLibrary::ExecuteHttpRequest<UAvatarById>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UAvatarById>(
 		this,
 		&UAvatarById::AvatarById_HttpRequestComplete,
 		requestURL,

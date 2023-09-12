@@ -58,6 +58,7 @@ void UWriteMethod::Activate()
 	//if this contract has never had its ABI loaded...
 	if (!Singleton->ContractsWithLoadedABIs.Contains(DeployedContract->Blockchain->Name.ToString() + DeployedContract->Address)) {
 		ULoadContractInternal* LoadContract = ULoadContractInternal::LoadContract(WorldContextObject, DeployedContract);
+		LoadContractRequest = LoadContract->Request;
 		LoadContract->OnLoadContractCompleted.AddDynamic(this, &UWriteMethod::LoadContractCompleted);
 		LoadContract->Activate();
 		return;
@@ -93,6 +94,7 @@ void UWriteMethod::Activate()
 			300.0F, //give the user lots of time to mess around setting high gas fees
 			SwitchChainHeaders,
 			SwitchChainContentString, false);
+		SwitchChainRequest = Request;
 		Request->OnProcessRequestComplete().BindLambda([&](FHttpRequestPtr req, FHttpResponsePtr res, bool bSucceeded) {
 			EErrorCode StatusCode;
 			FJsonObject JsonObject = UErrorCodeFunctionLibrary::TryParseResponseAsJson(res, bSucceeded, StatusCode);
@@ -141,7 +143,7 @@ void UWriteMethod::CallWriteMethod()
 		GasString = "&gasPrice=" + GasPrice;
 	}
 
-	UHttpHelperLibrary::ExecuteHttpRequest<UWriteMethod>(
+	WriteMethodRequest = UHttpHelperLibrary::ExecuteHttpRequest<UWriteMethod>(
 		this,
 		&UWriteMethod::WriteMethod_HttpRequestComplete,
 		UHttpHelperLibrary::APIBase + "writeMethod?contractAddress=" + DeployedContract->Address + "&nodeUrl=" + DeployedContract->Blockchain->NodeURL + "&network=" + DeployedContract->Blockchain->Name.ToString().Replace(TEXT(" "), TEXT("")) + "&methodName=" + MethodName.MethodName + "&value=" + Value + (LocalAccountName != "" ? "&localAccountName=" + LocalAccountName : "") + GasString,
@@ -153,16 +155,41 @@ void UWriteMethod::CallWriteMethod()
 	UE_LOG(LogEmergenceHttp, Display, TEXT("%s"), *ContentString);
 }
 
+void UWriteMethod::Cancel()
+{
+	if (LoadContractRequest) {
+		LoadContractRequest->OnProcessRequestComplete().Unbind();
+		LoadContractRequest->CancelRequest();
+	}
+	if (SwitchChainRequest) {
+		SwitchChainRequest->OnProcessRequestComplete().Unbind();
+		SwitchChainRequest->CancelRequest();
+	}
+	if (WriteMethodRequest) {
+		WriteMethodRequest->OnProcessRequestComplete().Unbind();
+		WriteMethodRequest->CancelRequest();
+	}
+}
+
+bool UWriteMethod::IsActive() const
+{
+	return LoadContractRequest->GetStatus() == EHttpRequestStatus::Processing ||
+		SwitchChainRequest->GetStatus() == EHttpRequestStatus::Processing ||
+		WriteMethodRequest->GetStatus() == EHttpRequestStatus::Processing;
+}
+
 void UWriteMethod::WriteMethod_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
 {
 	EErrorCode StatusCode;
 	FJsonObject JsonObject = UErrorCodeFunctionLibrary::TryParseResponseAsJson(HttpResponse, bSucceeded, StatusCode);
-	UE_LOG(LogEmergenceHttp, Display, TEXT("WriteMethod_HttpRequestComplete: %s"), *HttpResponse->GetContentAsString());
-	if (StatusCode == EErrorCode::EmergenceOk) {
-		this->TransactionHash = JsonObject.GetObjectField("message")->GetStringField("transactionHash");
-		GetTransactionStatus();
-		OnTransactionSent.Broadcast();
-		return;
+	if (HttpResponse) {
+		UE_LOG(LogEmergenceHttp, Display, TEXT("WriteMethod_HttpRequestComplete: %s"), *HttpResponse->GetContentAsString());
+		if (StatusCode == EErrorCode::EmergenceOk) {
+			this->TransactionHash = JsonObject.GetObjectField("message")->GetStringField("transactionHash");
+			GetTransactionStatus();
+			OnTransactionSent.Broadcast();
+			return;
+		}
 	}
 	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("WriteMethod", StatusCode);
 	this->OnTransactionConfirmed.Broadcast(FEmergenceTransaction(), StatusCode);

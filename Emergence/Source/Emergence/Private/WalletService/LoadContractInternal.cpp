@@ -29,7 +29,7 @@ void ULoadContractInternal::Activate()
 
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Content-Type", "application/json"});
-	UHttpHelperLibrary::ExecuteHttpRequest<ULoadContractInternal>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<ULoadContractInternal>(
 		this, 
 		&ULoadContractInternal::LoadContract_HttpRequestComplete, 
 		UHttpHelperLibrary::APIBase + "loadContract",

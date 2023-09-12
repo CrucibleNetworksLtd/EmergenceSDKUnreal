@@ -28,7 +28,7 @@ void UCreateWalletAndKeyStoreFile::Activate()
 	FString AccessToken = Emergence->GetCurrentAccessToken();
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Authorization", AccessToken});
-	UHttpHelperLibrary::ExecuteHttpRequest<UCreateWalletAndKeyStoreFile>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UCreateWalletAndKeyStoreFile>(
 		this,
 		&UCreateWalletAndKeyStoreFile::CreateWalletAndKeyStoreFile_HttpRequestComplete,
 		UHttpHelperLibrary::APIBase + "createWallet?path=" + Path + "&password=" + Password,

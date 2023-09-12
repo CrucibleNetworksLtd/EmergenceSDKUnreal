@@ -18,7 +18,7 @@ UValidateAccessToken* UValidateAccessToken::ValidateAccessToken(UObject* WorldCo
 
 void UValidateAccessToken::Activate()
 {
-	UHttpHelperLibrary::ExecuteHttpRequest<UValidateAccessToken>(this, &UValidateAccessToken::ValidateAccessToken_HttpRequestComplete, UHttpHelperLibrary::APIBase + "validate-access-token" + "?accessToken=" + AccessToken);
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UValidateAccessToken>(this, &UValidateAccessToken::ValidateAccessToken_HttpRequestComplete, UHttpHelperLibrary::APIBase + "validate-access-token" + "?accessToken=" + AccessToken);
 	UE_LOG(LogEmergenceHttp, Display, TEXT("ValidateAccessToken request started, calling ValidateAccessToken_HttpRequestComplete on request completed"));
 }
 

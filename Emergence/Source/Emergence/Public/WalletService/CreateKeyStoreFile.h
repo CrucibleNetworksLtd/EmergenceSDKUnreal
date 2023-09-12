@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EmergenceAsyncActionBase.h"
+#include "EmergenceAsyncSingleRequestBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -11,7 +11,7 @@
 #include "CreateKeyStoreFile.generated.h"
 
 UCLASS()
-class EMERGENCE_API UCreateKeyStoreFile : public UEmergenceAsyncActionBase
+class EMERGENCE_API UCreateKeyStoreFile : public UEmergenceAsyncSingleRequestBase
 {
 	GENERATED_BODY()
 public:
@@ -32,7 +32,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCreateKeyStoreFileCompleted OnCreateKeyStoreFileCompleted;
-
 private:
 	FString PrivateKey;
 	FString Password;

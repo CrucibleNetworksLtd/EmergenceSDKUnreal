@@ -21,7 +21,7 @@ void UGetTokenURIData::Activate()
 	FString requestURL = TokenURI;
 	TArray<TPair<FString, FString>> Headers;
 
-	UHttpHelperLibrary::ExecuteHttpRequest<UGetTokenURIData>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UGetTokenURIData>(
 		this,
 		&UGetTokenURIData::GetTokenURIData_HttpRequestComplete,
 		requestURL,

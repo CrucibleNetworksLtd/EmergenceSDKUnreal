@@ -81,6 +81,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Emergence Internal|Overlay Methods")
 	bool OwnedAvatarNFTCached = false;
 
+	UFUNCTION(BlueprintPure, Category = "Emergence Internal|Overlay Methods")
+	const bool IsMarketplaceBuild();
+
 	//HTTPService Functions
 private:
 	TSharedPtr<IHttpRequest, ESPMode::ThreadSafe> GetAccessTokenRequest, GetHandshakeRequest;
@@ -124,7 +127,7 @@ public:
 	FString GetCurrentAccessToken();
 
 	//Opens the Emergence UI, returns the widget to focus
-	UFUNCTION(BlueprintCallable, Category = "Emergence|Emergence Singleton")
+	UFUNCTION(BlueprintCallable, Category = "Emergence|Emergence Singleton", meta = (DeterminesOutputType = "EmergenceUIClass"))
 	UEmergenceUI* OpenEmergenceUI(APlayerController* OwnerPlayerController, TSubclassOf<UEmergenceUI> EmergenceUIClass);
 
 	//Gets the Emergence UI
@@ -214,6 +217,14 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence Requests")
 	FOnGetAccessTokenCompleted OnGetAccessTokenCompleted;
+
+	//This is a hacky way of logging in via an existing access token, do not use this in production. It won't work with most methods anyway, only for testing the UI stuff (won't work with walletconnect requiring stuff).
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|Debug Commands")
+	void ForceLoginViaAccessToken(FString AccessToken);
+
+	//this is used by ForceLoginViaAccessToken to override the returned value of IsConnected to true, if enabled
+	UPROPERTY()
+	bool ForceIsConnected = false;
 
 	UFUNCTION()
 	void OnOverlayClosed();

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EmergenceAsyncActionBase.h"
+#include "EmergenceCancelableAsyncBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -12,7 +12,7 @@
 #include "ReadMethod.generated.h"
 
 UCLASS()
-class EMERGENCE_API UReadMethod : public UEmergenceAsyncActionBase
+class EMERGENCE_API UReadMethod : public UEmergenceCancelableAsyncBase
 {
 	GENERATED_BODY()
 public:
@@ -34,6 +34,13 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnReadMethodCompleted OnReadMethodCompleted;
+
+	virtual void Cancel();
+
+	virtual bool IsActive() const;
+
+	FHttpRequestPtr LoadContractRequest;
+	FHttpRequestPtr ReadMethodRequest;
 private:
 	void ReadMethod_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 	

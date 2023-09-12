@@ -12,7 +12,7 @@
 
 void UGetDataFromUrl::Activate()
 {
-	UHttpHelperLibrary::ExecuteHttpRequest<UGetDataFromUrl>(this, &UGetDataFromUrl::GetDataFromUrl_HttpRequestComplete, this->Url);
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UGetDataFromUrl>(this, &UGetDataFromUrl::GetDataFromUrl_HttpRequestComplete, this->Url);
 	UE_LOG(LogEmergenceHttp, Display, TEXT("GetDataFromUrl request started (%s), calling GetDataFromUrl_HttpRequestComplete on request completed"), *this->Url);
 }
 

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EmergenceAsyncActionBase.h"
+#include "EmergenceAsyncSingleRequestBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -15,7 +15,7 @@
  *
  */
 UCLASS()
-class EMERGENCE_API ULoadAccountFromKeyStoreFile : public UEmergenceAsyncActionBase
+class EMERGENCE_API ULoadAccountFromKeyStoreFile : public UEmergenceAsyncSingleRequestBase
 {
 	GENERATED_BODY()
 public:
@@ -24,8 +24,7 @@ public:
 	 * @param Name Assignable name to identify the account.
 	 * @param Password The password of the keystore file.
 	 * @param Path The path of the keystore file.
-	 * @param NodeURL URL of the provider.
-	 * @param ChainID The Chain ID, which must be compatible with the given NodeURL.
+	 * @param Blockchain The blockchain to initalize with.
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Emergence|Keystore Local Wallet")
 	static ULoadAccountFromKeyStoreFile* LoadAccountFromKeyStoreFile(UObject* WorldContextObject, const FString& Name, const FString& Password, const FString& Path, const UEmergenceChain* Blockchain);

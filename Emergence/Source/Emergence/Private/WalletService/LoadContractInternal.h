@@ -28,6 +28,8 @@ public:
 
 	UPROPERTY()
 	FOnLoadContractCompleted OnLoadContractCompleted;
+
+	FHttpRequestPtr Request;
 private:
 	void LoadContract_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 	UObject* WorldContextObject;

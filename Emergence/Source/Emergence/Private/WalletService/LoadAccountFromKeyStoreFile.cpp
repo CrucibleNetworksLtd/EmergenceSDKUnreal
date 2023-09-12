@@ -44,7 +44,7 @@ void ULoadAccountFromKeyStoreFile::Activate()
 		TArray<TPair<FString, FString>> Headers;
 		Headers.Add(TPair<FString, FString>{"Content-Type", "application/json"});
 		Headers.Add(TPair<FString, FString>{"Authorization", AccessToken});
-		UHttpHelperLibrary::ExecuteHttpRequest<ULoadAccountFromKeyStoreFile>(
+		Request = UHttpHelperLibrary::ExecuteHttpRequest<ULoadAccountFromKeyStoreFile>(
 			this,
 			&ULoadAccountFromKeyStoreFile::LoadAccountFromKeyStoreFile_HttpRequestComplete,
 			UHttpHelperLibrary::APIBase + "loadAccount",

@@ -31,12 +31,12 @@ public:
 	FString Symbol;
 
 	UPROPERTY(EditAnywhere, Category="Blockchain")
-	int ChainID;
+	int64 ChainID;
 
 
 	UFUNCTION()
 	static UEmergenceChain* GetEmergenceChainDataFromConfig(const UObject* Outer);
 
 	UFUNCTION(BlueprintPure, Category="Emergence|Blockchain")
-	static UEmergenceChain* CreateEmergenceChain(FText _Name, FString _NodeURL, FString _Symbol, int _ChainID);
+	static UEmergenceChain* CreateEmergenceChain(FText _Name, FString _NodeURL, FString _Symbol, int64 _ChainID);
 };

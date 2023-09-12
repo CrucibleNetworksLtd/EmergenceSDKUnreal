@@ -23,7 +23,7 @@ void USetActivePersona::Activate()
 
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Authorization", AccessToken});
-	UHttpHelperLibrary::ExecuteHttpRequest<USetActivePersona>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<USetActivePersona>(
 		this, 
 		&USetActivePersona::SetActivePersona_HttpRequestComplete,
 		UHttpHelperLibrary::GetPersonaAPIURL() + "setActivePersona/" + this->PersonaID,

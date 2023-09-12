@@ -31,7 +31,7 @@ void UWriteDynamicMetadata::Activate()
 	Headers.Add(TPair<FString, FString>{"Host", UHttpHelperLibrary::GetInventoryServiceHostURL()});
 	Headers.Add(TPair<FString, FString>{"Content-Type", "application/json"});
 
-	UHttpHelperLibrary::ExecuteHttpRequest<UWriteDynamicMetadata>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UWriteDynamicMetadata>(
 		this,
 		&UWriteDynamicMetadata::WriteDynamicMetadata_HttpRequestComplete,
 		requestURL,

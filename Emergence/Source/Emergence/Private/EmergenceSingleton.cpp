@@ -23,6 +23,9 @@
 
 #include "EmergenceChainObject.h"
 
+#include "Engine/GameViewportClient.h"
+#include "TextureResource.h"
+
 UEmergenceSingleton::UEmergenceSingleton() {
 }
 
@@ -88,6 +91,15 @@ void UEmergenceSingleton::FlushOwnedAvatarNFTCache()
 {
 	this->OwnedAvatarNFTCache.Empty();
 	this->OwnedAvatarNFTCached = false;
+}
+
+const bool UEmergenceSingleton::IsMarketplaceBuild()
+{
+#if UNREAL_MARKETPLACE_BUILD
+	return true;
+#else
+	return false;
+#endif
 }
 
 bool UEmergenceSingleton::HandleDatabaseServerAuthFail(EErrorCode ErrorCode)
@@ -389,6 +401,12 @@ void UEmergenceSingleton::IsConnected()
 	}
 #endif
 
+	//part of a debugging method
+	if (ForceIsConnected) {
+		OnIsConnectedCompleted.Broadcast(true, this->CurrentAddress, EErrorCode::EmergenceOk);
+		return;
+	}
+
 	TArray<TPair<FString, FString>> Headers;
 	if (!this->DeviceID.IsEmpty()) { //we need to send the device ID if we have one, we won't have one for local EVM servers
 		Headers.Add(TPair<FString, FString>("deviceId", this->DeviceID));
@@ -440,6 +458,28 @@ void UEmergenceSingleton::KillSession()
 
 	UHttpHelperLibrary::ExecuteHttpRequest<UEmergenceSingleton>(this,&UEmergenceSingleton::KillSession_HttpRequestComplete, UHttpHelperLibrary::APIBase + "killSession", "GET", 60.0F, Headers);
 	UE_LOG(LogEmergenceHttp, Display, TEXT("KillSession request started, calling KillSession_HttpRequestComplete on request completed"));
+}
+
+void UEmergenceSingleton::ForceLoginViaAccessToken(FString AccessToken)
+{
+	//parse the user's address out of the access token
+	TSharedPtr<FJsonObject> JsonParsed;
+	TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<TCHAR>::Create(AccessToken);
+	if (FJsonSerializer::Deserialize(JsonReader, JsonParsed))
+	{
+		this->CurrentAddress = JsonParsed->GetStringField("address");
+	}
+	else {
+		UE_LOG(LogEmergence, Error, TEXT("Failed to parse access token from ForceLoginViaAccessToken!!!"));
+		return; //stop right now
+	}
+
+	this->CurrentAccessToken = AccessToken; //if it is given as an object string it can go right in, in theory
+	this->ForceIsConnected = true;
+	OnGetAccessTokenCompleted.Broadcast(EErrorCode::EmergenceOk);
+	UE_LOG(LogEmergence, Display, TEXT("Did a ForceLoginViaAccessToken"));
+	UE_LOG(LogEmergence, Display, TEXT("Current Address: %s"), *this->CurrentAddress);
+	UE_LOG(LogEmergence, Display, TEXT("Current Access Token: %s"), *this->CurrentAccessToken);
 }
 
 void UEmergenceSingleton::OnOverlayClosed()

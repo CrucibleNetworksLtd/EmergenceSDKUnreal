@@ -22,7 +22,7 @@ void UUpdatePersona::Activate()
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Content-Type", "application/json"});
 	Headers.Add(TPair<FString, FString>{"Authorization", UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->GetCurrentAccessToken()});
-	UHttpHelperLibrary::ExecuteHttpRequest<UUpdatePersona>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UUpdatePersona>(
 		this,
 		&UUpdatePersona::UpdatePersona_HttpRequestComplete,
 		UHttpHelperLibrary::GetPersonaAPIURL() + "persona",

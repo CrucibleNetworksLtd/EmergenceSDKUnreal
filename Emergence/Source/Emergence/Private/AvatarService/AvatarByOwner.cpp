@@ -21,7 +21,7 @@ void UAvatarByOwner::Activate()
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Host", UHttpHelperLibrary::GetAvatarServiceHostURL()});
 
-	UHttpHelperLibrary::ExecuteHttpRequest<UAvatarByOwner>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UAvatarByOwner>(
 		this,
 		&UAvatarByOwner::AvatarByOwner_HttpRequestComplete,
 		requestURL,
@@ -48,8 +48,8 @@ void UAvatarByOwner::AvatarByOwner_HttpRequestComplete(FHttpRequestPtr HttpReque
 		for (int i = 0; i < JsonObject.GetArrayField("message").Num(); i++) {
 			FString TokenURI = JsonObject.GetArrayField("message")[i].Get()->AsObject().Get()->GetStringField("tokenURI");
 			if (!TokenURI.IsEmpty()) {
-				auto Request = UHttpHelperLibrary::ExecuteHttpRequest<UAvatarByOwner>(this, &UAvatarByOwner::GetMetadata_HttpRequestComplete, TokenURI);
-				Requests.Add(TPair<FHttpRequestRef, FEmergenceAvatarResult>(Request, Results[i]));
+				auto NewRequest = UHttpHelperLibrary::ExecuteHttpRequest<UAvatarByOwner>(this, &UAvatarByOwner::GetMetadata_HttpRequestComplete, TokenURI);
+				Requests.Add(TPair<FHttpRequestRef, FEmergenceAvatarResult>(NewRequest, Results[i]));
 			}
 			else {
 				UE_LOG(LogEmergenceHttp, Warning, TEXT("One of the Avatar's TokenURI was blank in the AvatarByOwner, ignoring it."));
@@ -65,8 +65,8 @@ void UAvatarByOwner::AvatarByOwner_HttpRequestComplete(FHttpRequestPtr HttpReque
 
 void UAvatarByOwner::GetMetadata_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
 {
-	auto ThisRequest = Requests.FindByPredicate([HttpRequest](TPair<FHttpRequestRef, FEmergenceAvatarResult> Request) {
-		return Request.Key.Get().GetURL() == HttpRequest.Get()->GetURL();
+	auto ThisRequest = Requests.FindByPredicate([HttpRequest](TPair<FHttpRequestRef, FEmergenceAvatarResult> RequestToFind) {
+		return RequestToFind.Key.Get().GetURL() == HttpRequest.Get()->GetURL();
 	});
 
 	FJsonObjectConverter::JsonArrayStringToUStruct<FEmergenceAvatarMetadata>(*HttpResponse->GetContentAsString(), &ThisRequest->Value.Avatars, 0, 0);

@@ -52,7 +52,7 @@ struct FEmergenceInventoryFilterSet
 
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "UseBlockchain"), Category = "Emergence|Inventory Service|Filtering")
-    EEmergenceInventoryBlockchain Blockchain;
+    EEmergenceInventoryBlockchain Blockchain = EEmergenceInventoryBlockchain::Any;
 
 };
 
@@ -75,4 +75,22 @@ public:
     //Shows a message on the inventory to inform the user that the inventory they are view is not theirs
     UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Meta = (ExposeOnSpawn = true), Category = "Emergence Internal|Inventory Service|UI")
     bool ShowExternalInventoryMessage = false;
+
+    UFUNCTION(BlueprintPure, Category = "Emergence Internal|UI")
+    TArray<FString> GetCollectionWhitelist();
+
+    UPROPERTY()
+    UInventoryByOwner* InventoryByOwnerRequest;
+
+    UFUNCTION()
+    void OnGetInventoryAndAvatarsComplete_Internal(FEmergenceInventory Inventory, EErrorCode StatusCode);
+    
+    UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI")
+    void GetInventoryAndAvatars();
+
+    UFUNCTION(BlueprintImplementableEvent, Category = "Emergence Internal|UI")
+    void OnGetInventoryAndAvatarsComplete(const TArray<FEmergenceCombinedInventoryItem>& Inventory, EErrorCode StatusCode);
+
+    virtual void RemoveFromParent() override;
+
 };

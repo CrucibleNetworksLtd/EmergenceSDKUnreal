@@ -26,7 +26,7 @@ void UCreatePersona::Activate()
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Content-Type", "application/json"});
 	Headers.Add(TPair<FString, FString>{"Authorization", AccessToken});
-	UHttpHelperLibrary::ExecuteHttpRequest<UCreatePersona>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UCreatePersona>(
 		this, 
 		&UCreatePersona::CreatePersona_HttpRequestComplete, 
 		UHttpHelperLibrary::GetPersonaAPIURL() + "persona",

@@ -27,7 +27,7 @@ UCLASS()
 class UInventoryHelperLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-
+public:
 	UFUNCTION(BlueprintCallable, Category="Emergence Internal|Interface Helpers")
 	static TArray<FEmergenceCombinedInventoryItem> OrganiseInventoryItems(TArray<FEmergenceInventoryItem> InventoryItems, TArray< FEmergenceAvatarResult> Avatars);
 

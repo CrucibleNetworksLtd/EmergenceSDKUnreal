@@ -24,7 +24,9 @@ bool UEmergenceUI::GetUserHasLoggedInBefore()
 void UEmergenceUI::SwitchCurrentScreen(UUserWidget* NewScreen) {
 	if (CurrentScreenSlotBoundWidget) {
 		UUserWidget* TempNewScreen = NewScreen; //keep this around in-case doing the next method deletes whats holding it
-		CurrentScreenSlotBoundWidget->RemoveChildAt(0); //can only have one child, this is fine
+		if (CurrentScreenSlotBoundWidget->GetChildAt(0)) {
+			CurrentScreenSlotBoundWidget->GetChildAt(0)->RemoveFromParent(); //can only have one child, this is fine
+		}
 		CurrentScreenSlotBoundWidget->AddChild(TempNewScreen);
 		this->OnScreenSwitched.Broadcast(TempNewScreen);
 	}

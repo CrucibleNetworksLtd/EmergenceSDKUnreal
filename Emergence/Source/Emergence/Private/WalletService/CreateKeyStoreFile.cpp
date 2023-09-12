@@ -36,7 +36,7 @@ void UCreateKeyStoreFile::Activate()
 
 	TArray<TPair<FString, FString>> Headers;
 	Headers.Add(TPair<FString, FString>{"Authorization", AccessToken});
-	UHttpHelperLibrary::ExecuteHttpRequest<UCreateKeyStoreFile>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UCreateKeyStoreFile>(
 		this,
 		&UCreateKeyStoreFile::CreateKeyStoreFile_HttpRequestComplete,
 		UHttpHelperLibrary::APIBase + "createKeyStore" + "?privateKey=" + PrivateKey + "&password=" + Password + "&publicKey=" + PublicKey + "&path=" + Path,

@@ -3,16 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EmergenceAsyncActionBase.h"
+#include "EmergenceCancelableAsyncBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
 #include "EmergenceDeployment.h"
 #include "WalletService/GetTransactionStatus.h"
+#include "Engine/EngineTypes.h"
 #include "WriteMethod.generated.h"
 
 UCLASS()
-class EMERGENCE_API UWriteMethod : public UEmergenceAsyncActionBase
+class EMERGENCE_API UWriteMethod : public UEmergenceCancelableAsyncBase
 {
 	GENERATED_BODY()
 public:
@@ -47,6 +48,14 @@ public:
 
 	UFUNCTION()
 	void CallWriteMethod();
+
+	virtual void Cancel();
+
+	virtual bool IsActive() const;
+
+	FHttpRequestPtr LoadContractRequest;
+	FHttpRequestPtr SwitchChainRequest;
+	FHttpRequestPtr WriteMethodRequest;
 private:
 	void WriteMethod_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 	

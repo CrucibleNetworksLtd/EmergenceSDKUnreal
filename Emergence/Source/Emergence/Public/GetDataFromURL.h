@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EmergenceAsyncActionBase.h"
+#include "EmergenceAsyncSingleRequestBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -12,7 +12,7 @@
 /**
  */
 UCLASS()
-class EMERGENCE_API UGetDataFromUrl : public UEmergenceAsyncActionBase
+class EMERGENCE_API UGetDataFromUrl : public UEmergenceAsyncSingleRequestBase
 {
 	GENERATED_BODY()
 public:
@@ -33,7 +33,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnGetDataFromUrlCompleted OnGetDataFromUrlCompleted;
-
+	
 private:
 	void GetDataFromUrl_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 

@@ -21,7 +21,7 @@ UGetTransactionStatus* UGetTransactionStatus::GetTransactionStatus(UObject* Worl
 void UGetTransactionStatus::Activate()
 {
 	if (Blockchain) {
-		UHttpHelperLibrary::ExecuteHttpRequest<UGetTransactionStatus>(
+		Request = UHttpHelperLibrary::ExecuteHttpRequest<UGetTransactionStatus>(
 			this,
 			&UGetTransactionStatus::GetTransactionStatus_HttpRequestComplete,
 			UHttpHelperLibrary::APIBase + "GetTransactionStatus?transactionHash=" + TransactionHash + "&nodeURL=" + Blockchain->NodeURL);

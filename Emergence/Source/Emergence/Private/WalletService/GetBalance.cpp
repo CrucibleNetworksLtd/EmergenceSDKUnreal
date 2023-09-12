@@ -21,7 +21,7 @@ UGetBalance* UGetBalance::GetBalance(UObject* WorldContextObject, FString Addres
 void UGetBalance::Activate()
 {
 	if (Blockchain) {
-		UHttpHelperLibrary::ExecuteHttpRequest<UGetBalance>(
+		Request = UHttpHelperLibrary::ExecuteHttpRequest<UGetBalance>(
 			this,
 			&UGetBalance::GetBalance_HttpRequestComplete,
 			UHttpHelperLibrary::APIBase + "getbalance" + "?nodeUrl=" + Blockchain->NodeURL + "&address=" + this->Address);

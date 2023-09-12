@@ -97,6 +97,15 @@ private:
 			Settings->SaveConfig();
 		}
 
+#if (ENGINE_MINOR_VERSION >= 1) && (ENGINE_MAJOR_VERSION >= 5)
+		bool AllowLibcurlConnectionReuse = false;
+		if (GConfig) {
+			GConfig->GetBool(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("AllowLibcurlConnectionReuse"), AllowLibcurlConnectionReuse, GGameIni);
+			GConfig->SetBool(TEXT("HTTP.Curl"), TEXT("bForbidReuse"), !(AllowLibcurlConnectionReuse), GEngineIni);
+			GConfig->Flush(false, GEngineIni);
+		}
+#endif
+
 		return true;
 	}
 
@@ -106,10 +115,6 @@ private:
 		if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 		{
 			ISettingsContainerPtr SettingsContainer = SettingsModule->GetContainer("Project");
-
-			/*SettingsContainer->DescribeCategory("Emergence",
-				LOCTEXT("RuntimeWDCategoryName", "Emergence"),
-				LOCTEXT("RuntimeWDCategoryDescription", "Configuration for the Emergence plugin."));*/
 
 			// Register the settings
 			ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings("Project", "Plugins", "Emergence",

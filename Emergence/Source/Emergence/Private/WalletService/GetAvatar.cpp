@@ -19,7 +19,7 @@ UGetAvatar* UGetAvatar::GetAvatar(UObject* WorldContextObject, FString ImageMeta
 
 void UGetAvatar::Activate()
 {
-	UHttpHelperLibrary::ExecuteHttpRequest<UGetAvatar>(
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<UGetAvatar>(
 		this, 
 		&UGetAvatar::GetAvatar_HttpRequestComplete, 
 		ImageMetadataURI);

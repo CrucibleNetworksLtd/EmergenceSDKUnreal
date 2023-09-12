@@ -27,7 +27,7 @@ void URequestToSign::Activate()
 		Headers.Add(TPair<FString, FString>("deviceId", Singleton->DeviceID));
 	}
 
-	UHttpHelperLibrary::ExecuteHttpRequest<URequestToSign>(this, &URequestToSign::RequestToSign_HttpRequestComplete, UHttpHelperLibrary::APIBase + "request-to-sign", "POST", 60.0F, Headers, Content);
+	Request = UHttpHelperLibrary::ExecuteHttpRequest<URequestToSign>(this, &URequestToSign::RequestToSign_HttpRequestComplete, UHttpHelperLibrary::APIBase + "request-to-sign", "POST", 60.0F, Headers, Content);
 	UE_LOG(LogEmergenceHttp, Display, TEXT("RequestToSign request started, calling RequestToSign_HttpRequestComplete on request completed"));
 }
 

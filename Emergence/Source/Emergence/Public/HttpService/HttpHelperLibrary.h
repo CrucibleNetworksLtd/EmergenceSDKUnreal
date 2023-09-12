@@ -12,6 +12,7 @@
 #include "PlatformHttp.h"
 #include "Kismet/GameplayStatics.h"
 #include "EmergenceEVMServerSubsystem.h"
+#include "Engine/Engine.h"
 #include "HttpHelperLibrary.generated.h"
 
 /**
@@ -119,15 +120,17 @@ public:
 		}
 
 		if (DevelopmentEnvironmentString == "Production") {
-			return "7vz9y7rdpy.us-east-1.awsapprunner.com";
+//			return "7vz9y7rdpy.us-east-1.awsapprunner.com";
+			return "dysaw5zhak.us-east-1.awsapprunner.com"; //@hack, only staging is used right now
 		}
 
 		return "dysaw5zhak.us-east-1.awsapprunner.com";
 	}
 
 	inline static FString InternalIPFSURLToHTTP(FString IPFSURL) {
-		if (IPFSURL.Contains(TEXT("ipfs://")) || IPFSURL.Contains(TEXT("IPFS://"))) {
-			UE_LOG(LogEmergenceHttp, Display, TEXT("Found IPFS URL, replacing with public node..."));
+
+		if (IPFSURL.Contains(TEXT("ipfs://")) || IPFSURL.Contains(TEXT("IPFS://")) || IPFSURL.Contains(TEXT("https://cloudflare-ipfs.com/ipfs/"))) {
+			UE_LOG(LogEmergenceHttp, Display, TEXT("Found %s URL, replacing with public node..."), IPFSURL.Contains(TEXT("https://cloudflare-ipfs.com/ipfs/")) ? TEXT("Cloudflare-IPFS") : TEXT("IPFS"));
 
 			FString IPFSNode = TEXT("http://ipfs.openmeta.xyz/ipfs/");
 			FString CustomIPFSNode = "";
@@ -138,7 +141,9 @@ public:
 					IPFSNode = CustomIPFSNode;
 				}
 			}
-			FString NewURL = IPFSURL.Replace(TEXT("ipfs://"), *IPFSNode);
+			FString NewURL = IPFSURL.Replace(TEXT("ipfs://"), *IPFSNode)
+				.Replace(TEXT("IPFS://"), *IPFSNode)
+				.Replace(TEXT("https://cloudflare-ipfs.com/ipfs/"), *IPFSNode);
 			UE_LOG(LogEmergenceHttp, Display, TEXT("New URL is \"%s\""), *NewURL);
 			return NewURL;
 		}
@@ -162,15 +167,17 @@ public:
 
 		if (GEngine && static_cast<UObject*>(FunctionBindObject)) {
 			UObject* WorldContextObject = static_cast<UObject*>(FunctionBindObject);
-			UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-			if (
-				World && //get the world
-				World->GetGameInstance()) { //if we actually got a world, get the game instance
-				UEmergenceEVMServerSubsystem* EmergenceSubsystem = World->GetGameInstance()->GetSubsystem<UEmergenceEVMServerSubsystem>();
-				if (EmergenceSubsystem) {
-					EmergenceSubsystem->ActiveRequests.Add(HttpRequest);
-				}
-			};
+			if (WorldContextObject) {
+				UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+				if (
+					World && //get the world
+					World->GetGameInstance()) { //if we actually got a world, get the game instance
+					UEmergenceEVMServerSubsystem* EmergenceSubsystem = World->GetGameInstance()->GetSubsystem<UEmergenceEVMServerSubsystem>();
+					if (EmergenceSubsystem) {
+						EmergenceSubsystem->ActiveRequests.Add(HttpRequest);
+					}
+				};
+			}
 		}
 
 		if (FunctionBindFunction && FunctionBindObject) {
@@ -200,8 +207,11 @@ public:
 				HeaderLogText.Append(Headers[i].Key + ": " + Headers[i].Value + "\n");
 			}
 		}
-
-		FString Version = "Emergence " + GetEmergenceVersionNumber();
+#if UNREAL_MARKETPLACE_BUILD
+		FString Version = "Emergence " + GetEmergenceVersionNumber() + " EVMOnline";
+#else
+		FString Version = "Emergence " + GetEmergenceVersionNumber() + " LocalEVM";
+#endif
 		HttpRequest->SetHeader("User-Agent", FPlatformHttp::GetDefaultUserAgent() + " " + Version);
 
 		if (Content.Len() > 0 && HttpRequest->GetHeader("Content-Type").Len() > 0) {

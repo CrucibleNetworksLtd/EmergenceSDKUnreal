@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EmergenceAsyncActionBase.h"
+#include "EmergenceAsyncSingleRequestBase.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "ErrorCodeFunctionLibrary.h"
@@ -11,7 +11,7 @@
 #include "CreateWalletAndKeyStoreFile.generated.h"
 
 UCLASS()
-class EMERGENCE_API UCreateWalletAndKeyStoreFile : public UEmergenceAsyncActionBase
+class EMERGENCE_API UCreateWalletAndKeyStoreFile : public UEmergenceAsyncSingleRequestBase
 {
 	GENERATED_BODY()
 public:
@@ -30,7 +30,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCreateWalletAndKeyStoreFileCompleted OnCreateWalletAndKeyStoreFileCompleted;
-
 private:
 	FString Path;
 	FString Password;
