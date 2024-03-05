@@ -9,14 +9,14 @@
 #include "WalletService/LoadContractInternal.h"
 #include "Templates/SharedPointer.h"
 
-UWriteMethod* UWriteMethod::WriteMethod(UObject* WorldContextObject, UEmergenceDeployment* DeployedContract, FEmergenceContractMethod MethodName, FString Value, TArray<FString> Content, FString LocalAccountName, FString GasPrice, int NumberOfConfirmations, float TimeBetweenChecks)
+UWriteMethod* UWriteMethod::WriteMethod(UObject* WorldContextObject, UEmergenceDeployment* DeployedContract, FEmergenceContractMethod MethodName, FString Value, TArray<FString> Content, FString PrivateKey, FString GasPrice, int NumberOfConfirmations, float TimeBetweenChecks)
 {
 	UWriteMethod* BlueprintNode = NewObject<UWriteMethod>();
 	BlueprintNode->DeployedContract = DeployedContract;
 	BlueprintNode->MethodName = MethodName;
 	BlueprintNode->Content = Content;
 	BlueprintNode->WorldContextObject = WorldContextObject;
-	BlueprintNode->LocalAccountName = LocalAccountName;
+	BlueprintNode->LocalAccountName = PrivateKey;
 	BlueprintNode->GasPrice = GasPrice;
 	BlueprintNode->Value = Value;
 	BlueprintNode->NumberOfConfirmations = NumberOfConfirmations;
@@ -115,7 +115,12 @@ void UWriteMethod::Activate()
 	//if we're working with a local wallet 
 	else {
 		//switching networks isn't allowed
-		CallWriteMethod();
+		//CallWriteMethod();
+		auto EmergenceModule = FModuleManager::GetModuleChecked<FEmergenceModule>("Emergence");
+
+		FString TransactionResponse;
+		EmergenceModule.SendTransactionViaKeystore(this, DeployedContract, MethodName.MethodName, LocalAccountName, FString(), GasPrice, Value, TransactionResponse);
+		
 	}
 }
 
@@ -176,6 +181,34 @@ bool UWriteMethod::IsActive() const
 	return LoadContractRequest->GetStatus() == EHttpRequestStatus::Processing ||
 		SwitchChainRequest->GetStatus() == EHttpRequestStatus::Processing ||
 		WriteMethodRequest->GetStatus() == EHttpRequestStatus::Processing;
+}
+
+void UWriteMethod::SendTransactionViaKeystoreComplete(FString Response)
+{
+	EErrorCode StatusCode = EErrorCode::EmergenceInternalError;
+	if (!Response.IsEmpty())
+	{
+		TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
+		TSharedRef <TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Response);
+		if (FJsonSerializer::Deserialize(JsonReader, JsonObject) && JsonObject.IsValid())
+		{
+			if (JsonObject->HasField("statusCode"))
+			{
+				StatusCode = UErrorCodeFunctionLibrary::Conv_IntToErrorCode(JsonObject->GetIntegerField("statusCode"));
+			}
+		}
+
+		if (StatusCode == EErrorCode::EmergenceOk) {
+			this->TransactionHash = JsonObject->GetObjectField("message")->GetStringField("transactionHash");
+			GetTransactionStatus();
+			OnTransactionSent.Broadcast();
+			return;
+		}
+	}
+
+	//If the code gets to this point something has failed
+	UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("WriteMethod", StatusCode);
+	this->OnTransactionConfirmed.Broadcast(FEmergenceTransaction(), StatusCode);
 }
 
 void UWriteMethod::WriteMethod_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)

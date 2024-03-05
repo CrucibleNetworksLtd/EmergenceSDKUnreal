@@ -19,7 +19,7 @@ UEmergenceVRMMeshComponent::UEmergenceVRMMeshComponent()
 	VRoidSimpleAssetList = VRoidSimpleAssetListBP.Object;
 }
 
-void UEmergenceVRMMeshComponent::ActivateVRMMeshFromData(const TArray<uint8>& Data, const EVRMImportMaterialType MaterialType) {
+void UEmergenceVRMMeshComponent::ActivateVRMMeshFromData(const TArray<uint8>& Data, const EEmergenceVRMImportMaterialType MaterialType, UMaterial* MaterialOverride) {
 	if (!VrmAssetListObjectBPClass) {
 		UE_LOG(LogTemp, Error, TEXT("Couldn't find /VRM4U/VrmAssetListObjectBP.VrmAssetListObjectBP"));
 		return;
@@ -42,46 +42,63 @@ void UEmergenceVRMMeshComponent::ActivateVRMMeshFromData(const TArray<uint8>& Da
 	LatentInfo.UUID = FGuid::NewGuid().A;
 	LatentInfo.Linkage = 1;
 
-	OptionForRuntimeLoad.MaterialType = MaterialType;
+	if ((int)MaterialType < (int)EVRMImportMaterialType::VRMIMT_MAX) {
+		OptionForRuntimeLoad.MaterialType = (EVRMImportMaterialType)MaterialType;
+	}
+	else {
+		if (MaterialType == EEmergenceVRMImportMaterialType::VRMIMT_EmergenceMToonUnlit && MaterialOverride) {
+			VrmImportMaterialSet = NewObject<UVrmImportMaterialSet>();
+			VrmImportMaterialSet->Opaque = MaterialOverride;
+			VrmImportMaterialSet->OpaqueTwoSided = MaterialOverride;
+			VrmImportMaterialSet->Translucent = MaterialOverride;
+			VrmImportMaterialSet->TranslucentTwoSided = MaterialOverride;
+			VrmAssetListObject->MtoonUnlitSet = VrmImportMaterialSet;
+			OptionForRuntimeLoad.MaterialType = EVRMImportMaterialType::VRMIMT_MToonUnlit;
+		}
+	}
 
 	ULoaderBPFunctionLibrary::LoadVRMFromMemoryAsync(this->GetOwner(), VrmAssetListObject, OutVrmAsset, Data, OptionForRuntimeLoad, LatentInfo);
 }
 
-const EVRMImportMaterialType UEmergenceVRMMeshComponent::MaterialTypeFromString(const FString MaterialString)
+const EEmergenceVRMImportMaterialType UEmergenceVRMMeshComponent::MaterialTypeFromString(const FString MaterialString)
 {
 	FString SanitizedMaterialString = MaterialString.ToLower();
 
 	//MToonUnlit
 	if (MaterialString == "mtoonunlit") {
-		return EVRMImportMaterialType::VRMIMT_MToonUnlit;
+		return EEmergenceVRMImportMaterialType::VRMIMT_MToonUnlit;
 	}
 
 	//MToonLit
 	if (MaterialString == "mtoonlit") {
-		return EVRMImportMaterialType::VRMIMT_MToon;
+		return EEmergenceVRMImportMaterialType::VRMIMT_MToon;
 	}
 
 	//PBR
 	if (MaterialString == "pbr") {
-		return EVRMImportMaterialType::VRMIMT_glTF;
+		return EEmergenceVRMImportMaterialType::VRMIMT_glTF;
 	}
 
 	//Subsurface
 	if (MaterialString == "subsurface") {
-		return EVRMImportMaterialType::VRMIMT_SSS;
+		return EEmergenceVRMImportMaterialType::VRMIMT_SSS;
 	}
 
 	//Subsurface Profile
 	if (MaterialString == "subsurfaceprofile") {
-		return EVRMImportMaterialType::VRMIMT_SSSProfile;
+		return EEmergenceVRMImportMaterialType::VRMIMT_SSSProfile;
 	}
 
 	//Unlit
 	if (MaterialString == "unlit") {
-		return EVRMImportMaterialType::VRMIMT_Unlit;
+		return EEmergenceVRMImportMaterialType::VRMIMT_Unlit;
 	}
 
-	return EVRMImportMaterialType::VRMIMT_MToonUnlit;
+	if (MaterialString == "emergencemtoonunlit") {
+		return EEmergenceVRMImportMaterialType::VRMIMT_EmergenceMToonUnlit;
+	}
+
+	return EEmergenceVRMImportMaterialType::VRMIMT_MToonUnlit;
 }
 
 void UEmergenceVRMMeshComponent::VRMLoadCompleted(int Linkage)

@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>EmergenceEVMLocalServer</name>
+    </assembly>
+    <members>
+        <member name="M:NEthereumPoC.Controllers.IntegrationLibraryController.WalletConnectHandShake(System.String)">
+            <summary>
+            Attempts to initialize a session between the user's wallet and this server
+            </summary>
+            <remarks>
+            Sample request:
+            
+                GET api/handshake
+                {        
+                  "nodeUrl": "https://rinkeby.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134",
+                }
+            </remarks>
+        </member>
+        <member name="M:NEthereumPoC.Controllers.IntegrationLibraryController.SwitchChain(EmergenceEVMLocalServer.ViewModels.AddChainRequest)">
+            <remarks>
+            Sample request:
+            
+                POST api/addChain
+                {        
+                    "chainId": 137,
+                    "chainName": "Polygon",
+                    "currencyName": "MATIC",
+                    "currencySymbol": "MATIC",
+                    "currencyDecimals": 18,
+                    "rpcUrls": [
+                        "https://polygon-rpc.com/"
+                    ],
+                    "blockExplorerUrls": [
+                        "https://polygonscan.com/"
+                    ]
+                }
+            </remarks>
+        </member>
+        <member name="M:NEthereumPoC.Controllers.IntegrationLibraryController.LoadContract(EmergenceEVMLocalServer.ViewModels.LoadContractRequest)">
+            <summary>
+            Loads a contract in server's memory
+            </summary>
+            <remarks>
+            Sample request:
+            
+                POST api/loadContract
+                {        
+                  "contractAddress": "0x6641c25C4E9c81f8bF76AC5375c8Cb07DB6345ba",
+                  "ABI": "[{'anonymous':false,'inputs':[{'indexed':true,'internalType':'address','name':'owner','type':'address'},{'indexed':true,'internalType':'address','name':'approved','type':'address'},{'indexed':true,'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'Approval','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'internalType':'address','name':'owner','type':'address'},{'indexed':true,'internalType':'address','name':'operator','type':'address'},{'indexed':false,'internalType':'bool','name':'approved','type':'bool'}],'name':'ApprovalForAll','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'internalType':'address','name':'from','type':'address'},{'indexed':true,'internalType':'address','name':'to','type':'address'},{'indexed':true,'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'Transfer','type':'event'},{'inputs':[{'internalType':'address','name':'to','type':'address'},{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'approve','outputs':[],'stateMutability':'nonpayable','type':'function'},{'inputs':[{'internalType':'address','name':'owner','type':'address'}],'name':'balanceOf','outputs':[{'internalType':'uint256','name':'','type':'uint256'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'getApproved','outputs':[{'internalType':'address','name':'','type':'address'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'string','name':'name_','type':'string'},{'internalType':'string','name':'symbol_','type':'string'}],'name':'initialize','outputs':[],'stateMutability':'nonpayable','type':'function'},{'inputs':[{'internalType':'address','name':'owner','type':'address'},{'internalType':'address','name':'operator','type':'address'}],'name':'isApprovedForAll','outputs':[{'internalType':'bool','name':'','type':'bool'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'address','name':'to','type':'address'}],'name':'mint','outputs':[],'stateMutability':'payable','type':'function'},{'inputs':[],'name':'name','outputs':[{'internalType':'string','name':'','type':'string'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'ownerOf','outputs':[{'internalType':'address','name':'','type':'address'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'address','name':'from','type':'address'},{'internalType':'address','name':'to','type':'address'},{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'safeTransferFrom','outputs':[],'stateMutability':'nonpayable','type':'function'},{'inputs':[{'internalType':'address','name':'from','type':'address'},{'internalType':'address','name':'to','type':'address'},{'internalType':'uint256','name':'tokenId','type':'uint256'},{'internalType':'bytes','name':'_data','type':'bytes'}],'name':'safeTransferFrom','outputs':[],'stateMutability':'nonpayable','type':'function'},{'inputs':[{'internalType':'address','name':'operator','type':'address'},{'internalType':'bool','name':'approved','type':'bool'}],'name':'setApprovalForAll','outputs':[],'stateMutability':'nonpayable','type':'function'},{'inputs':[{'internalType':'bytes4','name':'interfaceId','type':'bytes4'}],'name':'supportsInterface','outputs':[{'internalType':'bool','name':'','type':'bool'}],'stateMutability':'view','type':'function'},{'inputs':[],'name':'symbol','outputs':[{'internalType':'string','name':'','type':'string'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'tokenURI','outputs':[{'internalType':'string','name':'','type':'string'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'address','name':'from','type':'address'},{'internalType':'address','name':'to','type':'address'},{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'transferFrom','outputs':[],'stateMutability':'nonpayable','type':'function'}]"
+                }
+            </remarks>
+        </member>
+        <member name="M:NEthereumPoC.Controllers.IntegrationLibraryController.writeMethod(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String[])">
+            <summary>
+            Invoke a write method of a given contract address
+            </summary>
+            <remarks>
+            Sample request:
+            
+                POST api/writeMethod
+                {
+                  "network": "polygon",
+                  "contractAddress": "0x6641c25C4E9c81f8bF76AC5375c8Cb07DB6345ba",
+                  "methodName": "mint",
+                  "nodeURL": "{networkname}.infura.io/{key},
+                  "localAccountName": null | namedAccount (followed by loadAccount),
+                  "gasPrice": null (will use avg gasPrice of latest blocks) | price in weis,
+                  "value": null | string value in weis
+                }
+            </remarks>
+        </member>
+        <member name="M:NEthereumPoC.Controllers.IntegrationLibraryController.readMethod(System.String,System.String,System.String,System.String,System.String[])">
+            <summary>
+            Invoke a read method of a given contract address
+            </summary>
+            <remarks>
+            Sample request:
+            
+                POST api/readMethod
+                {        
+                  "contractAddress": "0x6641c25C4E9c81f8bF76AC5375c8Cb07DB6345ba",
+                  "methodName": "tokenURI",
+                }
+            </remarks>
+        </member>
+        <member name="M:NEthereumPoC.Controllers.IntegrationLibraryController.CreateKeyStoreFile(System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates a key store for a given private key.
+            </summary>
+            <remarks>
+            Sample request:
+            
+                POST api/createKeyStore
+                {        
+                  "privateKey": "529889c7129cbeb7ef41edf8ae7f67337d4ea4b4a0783a3b00ef2319d246afdb",
+                  "password": "test",
+                  "publicKey": "0xae6d15962900Ba03aC171f976e9D116619e5252f",
+                  "path": "c:\\wallets\\wallet2.json",
+                }
+            </remarks>
+        </member>
+        <member name="M:NEthereumPoC.Controllers.IntegrationLibraryController.LoadAccountFromKeyStoreFile(EmergenceEVMLocalServer.ViewModels.LoadAccountRequest)">
+            <summary>
+            Loads an account from a keystore file into the server. Also initializes a new Web3 instance for the given account. 
+            </summary>
+            <remarks>
+            Sample request:
+            
+                POST api/loadAccount
+                {        
+                  "name": "DevAccount1",
+                  "password": "test",
+                  "path": "c:\\wallets\\wallet1.json",
+                  "nodeURL": "https://rinkeby.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134"
+                }
+            </remarks>
+        </member>
+    </members>
+</doc>

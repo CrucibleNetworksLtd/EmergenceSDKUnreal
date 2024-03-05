@@ -6,7 +6,7 @@ public class Emergence : ModuleRules
 {
 	public Emergence(ReadOnlyTargetRules Target) : base(Target)
 	{
-		bool MarketplaceBuild = false;
+		bool MarketplaceBuild = true;
 		
 		if(MarketplaceBuild || Target.Platform == UnrealTargetPlatform.Mac){
 			PublicDefinitions.Add("UNREAL_MARKETPLACE_BUILD=1");
@@ -15,6 +15,9 @@ public class Emergence : ModuleRules
 			PublicDefinitions.Add("UNREAL_MARKETPLACE_BUILD=0");
 			RuntimeDependencies.Add("$(BinaryOutputDir)", "$(PluginDir)/EmergenceServer/Windows/...");
 		}
+		
+		RuntimeDependencies.Add(
+		"$(TargetOutputDir)/../../Plugins/Emergence/EmergenceDll/Win64/...");
 		
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		CppStandard = CppStandardVersion.Cpp17;
