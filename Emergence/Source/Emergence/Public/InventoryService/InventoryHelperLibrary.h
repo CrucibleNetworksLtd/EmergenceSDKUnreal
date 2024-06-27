@@ -31,14 +31,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Emergence Internal|Interface Helpers")
 	static TArray<FEmergenceCombinedInventoryItem> OrganiseInventoryItems(TArray<FEmergenceInventoryItem> InventoryItems, TArray< FEmergenceAvatarResult> Avatars);
 
-	//Given an EmergenceInventoryItemsMetaContent array, find the best image's URL. PNGs are best, then JPEGs, then GIFs. If nothing is found, returns an empty string.
+	/**
+	 * Given an EmergenceInventoryItemsMetaContent array, find the best image's URL. PNGs are best, then JPEGs, then GIFs (GIFs only on Windows). If nothing is found, returns an empty string.
+	 * @param Contents This is useually retrieved from a Emergence Inventory Item's Metadata's Content array.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Emergence|Inventory Service")
 	static FString GetBestDisplayImage(TArray<FEmergenceInventoryItemsMetaContent> Contents);
 
 	UFUNCTION(BlueprintPure, Category = "Emergence Internal|Interface Helpers")
 	static FString GetBestModel(TArray<FEmergenceInventoryItemsMetaContent> Contents);
 
-	//Gets a set of categories, given a correctly formatted DynamicMetadata.
+	/**
+	 * Gets a set of categories, given a correctly formatted DynamicMetadata.
+	 * @param DynamicMetadata A dynamic metadata string, this is useually retrieved from a Emergence Inventory Item's Metadata's "dynamic metadata".
+	 */
 	UFUNCTION(BlueprintPure, Category = "Emergence|Inventory Service")
 	static TSet<FString> GetDynamicMetadataCategories(FString DynamicMetadata);
 };

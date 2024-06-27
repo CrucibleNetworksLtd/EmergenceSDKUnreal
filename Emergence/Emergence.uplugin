@@ -18,7 +18,6 @@
 	"bHasExplicitPlatforms": true,
 	"SupportedTargetPlatforms": [
 		"Win64",
-		"Win32",
 		"Mac"
 	],
 	"Modules": [
@@ -28,7 +27,6 @@
 			"LoadingPhase": "PreDefault",
 			"WhitelistPlatforms": [
 				"Win64",
-				"Win32",
 				"Mac"
 			]
 		},
@@ -38,7 +36,6 @@
 			"LoadingPhase": "Default",
 			"WhitelistPlatforms": [
 				"Win64",
-				"Win32",
 				"Mac"
 			]
 		},
@@ -48,7 +45,6 @@
 			"LoadingPhase": "Default",
 			"WhitelistPlatforms": [
 				"Win64",
-				"Win32",
 				"Mac"
 			]
 		},

@@ -20,7 +20,7 @@ void ULoadContractInternal::Activate()
 	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
 	Json->SetStringField("contractAddress", this->DeployedContract->Address);
 	Json->SetStringField("ABI", this->DeployedContract->Contract->ABI);
-	
+	Json->SetNumberField("chainId", this->DeployedContract->Blockchain->ChainID);
 	Json->SetStringField("network", this->DeployedContract->Blockchain->Name.ToString().Replace(TEXT(" "), TEXT("")));
 	FString OutputString;
 	TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&OutputString);

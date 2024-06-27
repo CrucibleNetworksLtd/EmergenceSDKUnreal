@@ -45,6 +45,11 @@ void UInventoryByOwner::InventoryByOwner_HttpRequestComplete(FHttpRequestPtr Htt
 			JsonObject.GetObjectField("message").ToSharedRef(),
 			&Inventory,
 			0, 0);
+
+		for (int i = 0; i < Inventory.items.Num(); i++) { //copy in the orginial data to fill out the new OrginialData property
+			Inventory.items[i].OriginalData = JsonObject.GetObjectField("message")->GetArrayField("items")[i];
+		}
+
 		OnInventoryByOwnerCompleted.Broadcast(Inventory, EErrorCode::EmergenceOk);
 	}
 	else {

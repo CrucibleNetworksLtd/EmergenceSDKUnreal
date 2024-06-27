@@ -1,7 +1,11 @@
 // Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
-
 #include "UI/EmergenceScreen.h"
+#if(ENGINE_MINOR_VERSION >= 4) && (ENGINE_MAJOR_VERSION >= 5)
+#include "HAL/PlatformApplicationMisc.h"
+#else
+#include "GenericPlatform/GenericPlatformMisc.h"
+#endif
 
 UEmergenceUI* UEmergenceScreen::GetEmergenceUI() {
 	if (this != nullptr 
@@ -13,4 +17,13 @@ UEmergenceUI* UEmergenceScreen::GetEmergenceUI() {
 	else {
 		return nullptr;
 	}
+}
+
+void UEmergenceScreen::CopyStringToClipboard(FString StringToCopy)
+{
+#if(ENGINE_MINOR_VERSION >= 4) && (ENGINE_MAJOR_VERSION >= 5)
+	FPlatformApplicationMisc::ClipboardCopy(*StringToCopy);
+#else
+	FPlatformMisc::ClipboardCopy(*StringToCopy);
+#endif
 }

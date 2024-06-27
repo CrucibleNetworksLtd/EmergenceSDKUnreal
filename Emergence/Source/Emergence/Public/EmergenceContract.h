@@ -34,16 +34,20 @@ public:
 
 	UEmergenceContract(FString _ABI);
 
+	/**
+	 * Creates a Emergence Contract object, which represents a contract ABI.
+	 * @param _ABI The contract's ABI. You can find this as an output of the contract's compiler, or on websites such as Etherscan or Polygonscan if the contract's ABI was uploaded.
+	 */
 	UFUNCTION(BlueprintPure, Category="Emergence|Contract")
 	static UEmergenceContract* CreateEmergenceContract(FString _ABI);
 	
-	UPROPERTY(EditAnywhere, Category="Contract")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Contract")
 	FString ABI;
 
-	UPROPERTY(VisibleAnywhere, Category="Contract Methods")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Contract Methods")
 	TArray<FEmergenceContractMethod> ReadMethods;
 
-	UPROPERTY(VisibleAnywhere, Category="Contract Methods")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Contract Methods")
 	TArray<FEmergenceContractMethod> WriteMethods;
 
 	UFUNCTION(CallInEditor, Category="Contract Methods")

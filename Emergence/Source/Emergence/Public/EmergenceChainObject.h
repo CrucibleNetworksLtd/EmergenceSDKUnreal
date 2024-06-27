@@ -21,22 +21,29 @@ public:
 
 	UEmergenceChain(FText Name, FString _NodeURL, FString Symbol);
 
-	UPROPERTY(EditAnywhere, Category="Blockchain")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Blockchain")
 	FText Name;
 
-	UPROPERTY(EditAnywhere, Category="Blockchain")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Blockchain")
 	FString NodeURL;
 
-	UPROPERTY(EditAnywhere, Category="Blockchain")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Blockchain")
 	FString Symbol;
 
-	UPROPERTY(EditAnywhere, Category="Blockchain")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Blockchain")
 	int64 ChainID;
 
 
 	UFUNCTION()
 	static UEmergenceChain* GetEmergenceChainDataFromConfig(const UObject* Outer);
 
+	/**
+	 * Creates a Emergence Blockchain object, which represents a single blockchain.
+	 * @param _Name Name of the blockchain.
+	 * @param _NodeURL RPC URL of the blockchain.
+	 * @param _Symbol Symbol of the blockchain (for example ETH, or MATIC).
+	 * @param _ChainID Chain ID of the blockchain.
+	 */
 	UFUNCTION(BlueprintPure, Category="Emergence|Blockchain")
 	static UEmergenceChain* CreateEmergenceChain(FText _Name, FString _NodeURL, FString _Symbol, int64 _ChainID);
 };

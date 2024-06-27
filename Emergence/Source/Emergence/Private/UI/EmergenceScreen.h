@@ -18,4 +18,8 @@ public:
 	//Get the main Emergence UI instance that is holding this screen.
 	UFUNCTION(BlueprintPure, Category = "Emergence Internal|UI")
 	UEmergenceUI* GetEmergenceUI();
+
+	//Copies a given string to the user's clipboard
+	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI")
+	void CopyStringToClipboard(FString StringToCopy);
 };

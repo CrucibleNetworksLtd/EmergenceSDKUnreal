@@ -79,14 +79,26 @@ public:
 	//Gets any pre-content parse errors
 	static EErrorCode GetResponseErrors(FHttpResponsePtr HttpResponse, bool bSucceeded);
 
+	/**
+	 * Converts an interger to an error code enum.
+	 * @param HttpStatus Http status code as an interger to be converted.
+	 */
 	UFUNCTION(BlueprintPure, Category="Emergence|Error Code Helpers", meta = (DisplayName = "Status Code Int To Status Code Enum", CompactNodeTitle = "->", BlueprintAutocast))
 	static EErrorCode Conv_IntToErrorCode(int32 HttpStatus);
 
+	/**
+	 * Converts an error code enum to an interger.
+	 * @param HttpStatus Error code enum to be converted to an interger.
+	 */
 	UFUNCTION(BlueprintPure, Category="Emergence|Error Code Helpers", meta = (DisplayName = "Status Code Enum to Status Code Int", CompactNodeTitle = "->", BlueprintAutocast))
 	static int32 Conv_ErrorCodeToInt(EErrorCode ErrorCode);
 
+	/**
+	 * Converts an error code enum to a bool. If its "Emergence Ok", its true, otherwise its false.
+	 * @param HttpStatus Error code enum to be converted to a bool. If its "Emergence Ok", its true, otherwise its false.
+	 */
 	UFUNCTION(BlueprintPure, Category="Emergence|Error Code Helpers", meta = (DisplayName = "Status Code Enum to Status Ok Bool", CompactNodeTitle = "->", BlueprintAutocast))
 	static bool Conv_ErrorCodeToBool(EErrorCode ErrorCode);
 
-	static const TMap<int32, TEnumAsByte<EErrorCode>> StatusCodeIntToErrorCode;
+	static const TMap<int32, EErrorCode> StatusCodeIntToErrorCode;
 };

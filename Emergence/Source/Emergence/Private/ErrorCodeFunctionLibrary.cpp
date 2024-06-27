@@ -3,9 +3,8 @@
 
 #include "ErrorCodeFunctionLibrary.h"
 #include "Interfaces/IHttpResponse.h"
-#pragma warning( push )
-#pragma warning( disable : 4996 )
-const TMap <int32, TEnumAsByte<EErrorCode>> UErrorCodeFunctionLibrary::StatusCodeIntToErrorCode = {
+
+const TMap <int32, EErrorCode> UErrorCodeFunctionLibrary::StatusCodeIntToErrorCode = {
 	{(int32)EErrorCode::EmergenceOk, EErrorCode::EmergenceOk},
 	{(int32)EErrorCode::EmergenceNotConnected, EErrorCode::EmergenceNotConnected},
 	{(int32)EErrorCode::EmergenceAlreadyConnected, EErrorCode::EmergenceAlreadyConnected},
@@ -56,7 +55,6 @@ const TMap <int32, TEnumAsByte<EErrorCode>> UErrorCodeFunctionLibrary::StatusCod
 	{-5, EErrorCode::EmergenceClientWrongType},
 	{512, EErrorCode::EmergenceInternalError}
 };
-#pragma warning( pop )
 
 FJsonObject UErrorCodeFunctionLibrary::TryParseResponseAsJson(FHttpResponsePtr HttpResponse, bool bSucceeded, EErrorCode& ReturnResponseCode) {
 
@@ -102,7 +100,7 @@ EErrorCode UErrorCodeFunctionLibrary::GetResponseErrors(FHttpResponsePtr HttpRes
 
 EErrorCode UErrorCodeFunctionLibrary::Conv_IntToErrorCode(int32 Status)
 {
-	auto ErrorCode = UErrorCodeFunctionLibrary::StatusCodeIntToErrorCode.Find(Status);
+	const EErrorCode* ErrorCode = UErrorCodeFunctionLibrary::StatusCodeIntToErrorCode.Find(Status);
 	if (ErrorCode != nullptr) {
 		return *ErrorCode;
 	}

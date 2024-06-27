@@ -15,11 +15,19 @@ class EMERGENCE_API UEmergenceJSONHelpers : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
-	//Returns the ReadMethod's wrapped JSON array as a JSON string. "Return Value" is if it was a success.
+	/**
+	 * Returns the ReadMethod's wrapped JSON array as a JSON string. "Return Value" is if it was a success.
+	 * @param JSONObject JSONObject to turn into a string.
+	 * @param OutputString The returned string.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Emergence|Helpers", meta = (DisplayName = "Read Method JSON To String"))
 	static bool ReadMethodJSONToString(FJsonObjectWrapper JSONObject, FString& OutputString);
 
-	//Returns the ReadMethod's wrapped JSON array as a array of strings. "Return Value" is if it was a success.
+	/**
+	 * Returns the ReadMethod's wrapped JSON array as a array of strings. "Return Value" is if it was a success.
+	 * @param JSONObject JSONObject to turn into a string.
+	 * @param OutputString The returned array of strings.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Emergence|Helpers", meta = (DisplayName = "Read Method JSON To String Array"))
 	static bool ReadMethodJSONToStringArray(FJsonObjectWrapper JSONObject, TArray<FString>& OutputString);
 };

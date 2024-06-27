@@ -33,11 +33,19 @@ public class Emergence : ModuleRules
 				"Slate",
 				"SlateCore",
 				"Projects",
-				"HTTP"
-				// ... add other public dependencies that you statically link with here ...
+				"HTTP",
 			}
 		);
-			
+
+		if (Target.Version.MajorVersion >= 5 && Target.Version.MinorVersion >= 4)
+		{
+			PublicDependencyModuleNames.AddRange(
+				new string[]
+				{
+					"ApplicationCore"
+				}
+			);
+		}	
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]

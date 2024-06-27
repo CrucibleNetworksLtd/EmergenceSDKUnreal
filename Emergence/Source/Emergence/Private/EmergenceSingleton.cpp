@@ -51,7 +51,7 @@ UEmergenceSingleton* UEmergenceSingleton::GetEmergenceManager(const UObject* Con
 		UE_LOG(LogEmergenceHttp, Verbose, TEXT("Got Emergence Singleton: %s"), *Manager->GetFName().ToString());
 		return Manager.Get();
 	}
-	UE_LOG(LogEmergenceHttp, Error, TEXT("Text %s"), "No manager avalible, whats going on?");
+	UE_LOG(LogEmergenceHttp, Error, TEXT("Emergence singleton error: No manager avalible, whats going on?"));
 	return nullptr;
 }
 
@@ -71,13 +71,54 @@ void UEmergenceSingleton::Shutdown()
 	FGameDelegates::Get().GetEndPlayMapDelegate().RemoveAll(this);
 
 	RemoveFromRoot();
+#if(ENGINE_MINOR_VERSION >= 4) && (ENGINE_MAJOR_VERSION >= 5)
+	MarkAsGarbage();
+#else
 	MarkPendingKill();
+#endif
 }
 
 void UEmergenceSingleton::SetCachedCurrentPersona(FEmergencePersona NewCachedCurrentPersona)
 {
 	this->CachedCurrentPersona = NewCachedCurrentPersona;
 	OnCachedPersonaUpdated.Broadcast(this->CachedCurrentPersona);
+}
+
+EFutureverseEnvironment UEmergenceSingleton::GetFutureverseEnvironment()
+{
+
+#if UE_BUILD_SHIPPING
+	FString Environment = "Production"; //Shipping defaults to production
+	GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseShippingEnvironment"), Environment, GGameIni);
+#else
+	FString Environment = "Staging"; //Everything else defaults to staging
+	GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseDevelopmentEnvironment"), Environment, GGameIni);
+#endif
+
+	if (Environment == "Production") {
+		//Production Env URL
+		return EFutureverseEnvironment::Production;
+	}
+
+	if (Environment == "Development") {
+		//Development Env URL
+		return EFutureverseEnvironment::Development;
+	}
+
+	//Staging Env URL
+	return EFutureverseEnvironment::Staging;
+}
+
+void UEmergenceSingleton::SetFuturepassInfomationCache(FLinkedFuturepassInformationResponse FuturepassInfo)
+{
+	FuturepassInfoCache = FuturepassInfo;
+	FuturepassInfoCacheIsSet = true;
+}
+
+void UEmergenceSingleton::ClearFuturepassInfomationCache()
+{
+	FuturepassInfoCache = FLinkedFuturepassInformationResponse();
+	FuturepassInfoCacheIsSet = false;
 }
 
 void UEmergenceSingleton::SetOwnedAvatarNFTCache(TArray<FEmergenceAvatarResult> Results)
@@ -229,6 +270,16 @@ FString UEmergenceSingleton::GetCachedAddress()
 	}
 }
 
+FString UEmergenceSingleton::GetCachedChecksummedAddress()
+{
+	if (this->CurrentAddress.Len() > 0) {
+		return this->CurrentChecksummedAddress;
+	}
+	else {
+		return FString("-1");
+	}
+}
+
 void UEmergenceSingleton::GetWalletConnectURI()
 {
 	this->DeviceID = ""; //clear the device ID, we'll be getting a new one so we don't want to be able to accidently send an old header
@@ -246,22 +297,23 @@ void UEmergenceSingleton::GetQRCode_HttpRequestComplete(FHttpRequestPtr HttpRequ
 {
 	EErrorCode ResponseCode = UErrorCodeFunctionLibrary::GetResponseErrors(HttpResponse, bSucceeded);
 	if (!EHttpResponseCodes::IsOk(UErrorCodeFunctionLibrary::Conv_ErrorCodeToInt(ResponseCode))) {
-		OnGetQRCodeCompleted.Broadcast(nullptr, ResponseCode);
+		OnGetQRCodeCompleted.Broadcast(nullptr, FString(), ResponseCode);
 		OnAnyRequestError.Broadcast("GetQRCode", ResponseCode);
 		return;
 	}
 
-	TArray<uint8> ResponceBytes = HttpResponse->GetContent();
+	TArray<uint8> ResponseBytes = HttpResponse->GetContent();
 	UTexture2D* QRCodeTexture;
-	if (RawDataToBrush(*(FString(TEXT("QRCODE"))), ResponceBytes, QRCodeTexture)) {
+	if (RawDataToBrush(*(FString(TEXT("QRCODE"))), ResponseBytes, QRCodeTexture)) {
 #if UNREAL_MARKETPLACE_BUILD
 		this->DeviceID = HttpResponse->GetHeader("deviceId");
 #endif
-		OnGetQRCodeCompleted.Broadcast(QRCodeTexture, EErrorCode::EmergenceOk);
+		FString WalletConnectString = HttpResponse->GetHeader("walletconnecturi");
+		OnGetQRCodeCompleted.Broadcast(QRCodeTexture, WalletConnectString, EErrorCode::EmergenceOk);
 		return;
 	}
 	else {
-		OnGetQRCodeCompleted.Broadcast(nullptr, EErrorCode::EmergenceClientWrongType);
+		OnGetQRCodeCompleted.Broadcast(nullptr, FString(), EErrorCode::EmergenceClientWrongType);
 		OnAnyRequestError.Broadcast("GetQRCode", EErrorCode::EmergenceClientWrongType);
 	}
 }
@@ -281,7 +333,21 @@ bool UEmergenceSingleton::RawDataToBrush(FName ResourceName, const TArray< uint8
 
 	TArray<uint8> DecodedImage;
 	IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
+	TSharedPtr<IImageWrapper> ImageWrapper;
+
+	if (InRawData.Num() == 0) { //if there is no raw data, fail out
+		return false;
+	}
+
+	if (InRawData[0] == 0x89) {
+		ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
+	}
+	else if (InRawData[0] == 0xFF && InRawData[1] == 0xD8 && InRawData[2] == 0xFF) {
+		ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::JPEG);
+	}
+	else {
+		return false;
+	}
 
 	if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(InRawData.GetData(), InRawData.Num()))
 	{
@@ -294,11 +360,15 @@ bool UEmergenceSingleton::RawDataToBrush(FName ResourceName, const TArray< uint8
 
 			Width = ImageWrapper->GetWidth();
 			Height = ImageWrapper->GetHeight();
-
+#if(ENGINE_MINOR_VERSION >= 4) && (ENGINE_MAJOR_VERSION >= 5)
+			void* TextureData = LoadedT2D->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+			FMemory::Memcpy(TextureData, UncompressedBGRA.GetData(), UncompressedBGRA.Num());
+			LoadedT2D->GetPlatformData()->Mips[0].BulkData.Unlock();
+#else
 			void* TextureData = LoadedT2D->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
 			FMemory::Memcpy(TextureData, UncompressedBGRA.GetData(), UncompressedBGRA.Num());
 			LoadedT2D->PlatformData->Mips[0].BulkData.Unlock();
-
+#endif
 			LoadedT2D->UpdateResource();
 			return true;
 		}
@@ -315,6 +385,10 @@ void UEmergenceSingleton::GetHandshake_HttpRequestComplete(FHttpRequestPtr HttpR
 		if (JsonObject.GetObjectField("message")->TryGetStringField("address", Address)) {
 			OnGetHandshakeCompleted.Broadcast(Address, StatusCode);
 			this->CurrentAddress = Address;
+			FString ChecksummedAddress;
+			if (JsonObject.GetObjectField("message")->TryGetStringField("checksummedAddress", ChecksummedAddress)) {
+				this->CurrentChecksummedAddress = ChecksummedAddress;
+			}
 			GetAccessToken();
 		}
 		else {
@@ -327,7 +401,7 @@ void UEmergenceSingleton::GetHandshake_HttpRequestComplete(FHttpRequestPtr HttpR
 	OnAnyRequestError.Broadcast("GetHandshake", StatusCode);
 }
 
-void UEmergenceSingleton::GetHandshake()
+void UEmergenceSingleton::GetHandshake(int Timeout)
 {
 	auto ChainData = UEmergenceChain::GetEmergenceChainDataFromConfig(this);
 	FString NodeURL = ChainData->NodeURL;
@@ -339,11 +413,12 @@ void UEmergenceSingleton::GetHandshake()
 	if (!this->DeviceID.IsEmpty()) { //we need to send the device ID if we have one, we won't have one for local EVM servers
 		Headers.Add(TPair<FString, FString>("deviceId", this->DeviceID));
 	}
+	Headers.Add(TPair<FString, FString>("timeout", FString::FromInt(Timeout)));
 	
 	GetHandshakeRequest = UHttpHelperLibrary::ExecuteHttpRequest<UEmergenceSingleton>(
 		this,&UEmergenceSingleton::GetHandshake_HttpRequestComplete, 
 		UHttpHelperLibrary::APIBase + "handshake" + "?nodeUrl=" + NodeURL,
-		"GET", 60.F, Headers);  //extra time because they might be fiddling with their phones
+		"GET", Timeout, Headers); //use the timeout provided
 	
 	UE_LOG(LogEmergenceHttp, Display, TEXT("GetHandshake request started, calling GetHandshake_HttpRequestComplete on request completed"));
 }

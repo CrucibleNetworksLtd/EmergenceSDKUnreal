@@ -21,6 +21,12 @@ public:
 
 	UEmergenceDeployment(FString Address, UEmergenceChain* Blockchain, UEmergenceContract* Contract);
 
+	/**
+	 * Creates a Emergence Deployed Contract object, which represents a contract on chain.
+	 * @param Address The Address of the contract on the blockchain.
+	 * @param Blockchain A blockchain object representing the blockchain that this contract resides on.
+	 * @param Contract A contract object which contains the ABI of this contract.
+	 */
 	UFUNCTION(BlueprintPure, Category="Emergence|Deployed Contract")
 	static UEmergenceDeployment* CreateEmergenceDeployment(FString Address, UEmergenceChain* Blockchain, UEmergenceContract* Contract);
 

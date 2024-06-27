@@ -16,6 +16,8 @@
 #include "GameFramework/PlayerController.h"
 #include "Emergence.h"
 #include "Brushes/SlateDynamicImageBrush.h"
+#include "Futurepass/GetLinkedFuturepassInformation.h"
+#include "Environment.h"
 #include "EmergenceSingleton.generated.h"
 
 #pragma warning( push )
@@ -44,6 +46,25 @@ public:
 
 	void SetCachedCurrentPersona(FEmergencePersona NewCachedCurrentPersona);
 
+	UFUNCTION(BlueprintPure, Category = "Emergence Internal|Overlay Methods")
+	static EFutureverseEnvironment GetFutureverseEnvironment();
+
+	//Sets the Emergence Singleton's cache of the futurepass information (and sets FuturepassInfoIsSet to true)
+	UFUNCTION(BlueprintCallable)
+	void SetFuturepassInfomationCache(FLinkedFuturepassInformationResponse FuturepassInfo);
+
+	//Clears the Emergence Singleton's cache of the futurepass information (and sets FuturepassInfoIsSet to false)
+	UFUNCTION(BlueprintCallable)
+	void ClearFuturepassInfomationCache();
+
+	//Cache of the last Futurepass information set as part of SetFuturepassInfomationCache
+	UPROPERTY(BlueprintReadOnly)
+	FLinkedFuturepassInformationResponse FuturepassInfoCache;
+
+	//Is FuturepassInfoCache valid?
+	UPROPERTY(BlueprintReadOnly)
+	bool FuturepassInfoCacheIsSet = false;
+
 	UPROPERTY()
 	FString DeviceID;
 
@@ -52,7 +73,8 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCachedPersonaUpdated, FEmergencePersona, NewPersona);
 
-	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence Requests")
+	//When the user's active persona changes, this is called
+	UPROPERTY(BlueprintAssignable, Category = "Emergence|Emergence Singleton")
 	FOnCachedPersonaUpdated OnCachedPersonaUpdated;
 
 	UPROPERTY()
@@ -94,6 +116,9 @@ private:
 	UPROPERTY()
 	FString CurrentAddress = "";
 
+	UPROPERTY()
+	FString CurrentChecksummedAddress = "";
+
 	//Returns true if this error code is a 401, and calls OnDatabaseAuthFailed. false on success.
 	bool HandleDatabaseServerAuthFail(EErrorCode ErrorCode);
 
@@ -126,25 +151,32 @@ public:
 	UFUNCTION(Category = "Emergence|Emergence Singleton", BlueprintPure, Meta = (DisplayName="Get Cached Access Token"))
 	FString GetCurrentAccessToken();
 
-	//Opens the Emergence UI, returns the widget to focus
-	UFUNCTION(BlueprintCallable, Category = "Emergence|Emergence Singleton", meta = (DeterminesOutputType = "EmergenceUIClass"))
+	/**
+	 * Opens the Emergence UI (also known as the Overlay), returns the widget to focus.
+	 * @param OwnerPlayerController Player Controller that the overlay should be shown to. Should usually be the local player, who is usually "Player Controller 0".
+	 * @param EmergenceUIClass Should always be set to "EmergenceUI_BP".
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Emergence|Overlay", meta = (DeterminesOutputType = "EmergenceUIClass"))
 	UEmergenceUI* OpenEmergenceUI(APlayerController* OwnerPlayerController, TSubclassOf<UEmergenceUI> EmergenceUIClass);
 
-	//Gets the Emergence UI
-	UFUNCTION(BlueprintPure, Category = "Emergence|Emergence Singleton")
+	//Gets the Emergence UI (also known as the Overlay), also known as the Emergence Overlay
+	UFUNCTION(BlueprintPure, Category = "Emergence|Overlay")
 	UEmergenceUI* GetEmergenceUI();
 
-	//Do we have an access token?
+	//Do we have an access token? This will likely only be true when the player has logged in via wallet connect.
 	UFUNCTION(BlueprintPure, Category = "Emergence|Emergence Singleton")
 	bool HasAccessToken();
 
-	//Do we have a wallet connected address?
+	//Do we have a wallet connected address? This will likely only be true when the player has logged in via wallet connect.
 	UFUNCTION(BlueprintPure, Category = "Emergence|Emergence Singleton")
 	bool HasCachedAddress();
 
 	//Returns the last wallet connected address (if GetHandshake has been called already) If we don't have one yet, returns "-1".
 	UFUNCTION(BlueprintPure, Category = "Emergence|Emergence Singleton")
 	FString GetCachedAddress();
+
+	UFUNCTION()
+	FString GetCachedChecksummedAddress();
 
 	//GetWalletConnectURI stuff
 	UFUNCTION(BlueprintCallable, meta=(DeprecatedFunction), Category = "Emergence Internal|Overlay Methods")
@@ -160,7 +192,7 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetWalletConnectURIRequestCompleted, FString, WalletConnectURI, EErrorCode, StatusCode);
 
-	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence Requests")
+	UPROPERTY(BlueprintAssignable, Category = "Emergence Internal|Emergence Singleton")
 	FOnGetWalletConnectURIRequestCompleted OnGetWalletConnectURIRequestCompleted;
 
 
@@ -168,22 +200,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|Overlay Methods")
 	void GetQRCode();
 
-	bool RawDataToBrush(FName ResourceName, const TArray<uint8>& InRawData, UTexture2D*& LoadedT2D);
+	UFUNCTION()
+	static bool RawDataToBrush(FName ResourceName, const TArray<uint8>& InRawData, UTexture2D*& LoadedT2D);
 
 	static TSharedPtr<FSlateDynamicImageBrush> RawDataToBrush(FName ResourceName, const TArray<uint8>& InRawData);
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetQRCodeCompleted, UTexture2D*, Icon, EErrorCode, StatusCode);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnGetQRCodeCompleted, UTexture2D*, Icon, FString, WalletConnectString, EErrorCode, StatusCode);
 
-	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence Requests")
+	UPROPERTY(BlueprintAssignable, Category = "Emergence Internal|Emergence Singleton")
 	FOnGetQRCodeCompleted OnGetQRCodeCompleted;
 
 	//Handshake stuff
 	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|Overlay Methods")
-	void GetHandshake();
+	void GetHandshake(int Timeout = 60);
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetHandshakeCompleted, FString, Address, EErrorCode, StatusCode);
 
-	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence Requests")
+	UPROPERTY(BlueprintAssignable, Category = "Emergence Internal|Emergence Singleton")
 	FOnGetHandshakeCompleted OnGetHandshakeCompleted;
 
 	//ReinitializeWalletConnect stuff
@@ -192,7 +225,7 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReinitializeWalletConnectCompleted, EErrorCode, StatusCode);
 
-	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence Requests")
+	UPROPERTY(BlueprintAssignable, Category = "Emergence Internal|Emergence Singleton")
 	FOnReinitializeWalletConnectCompleted OnReinitializeWalletConnectCompleted;
 
 	//isConnected stuff
@@ -201,7 +234,7 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnIsConnectedCompleted, bool, IsConnected, FString, Address, EErrorCode, StatusCode);
 
-	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence Requests")
+	UPROPERTY(BlueprintAssignable, Category = "Emergence Internal|Emergence Singleton")
 	FOnIsConnectedCompleted OnIsConnectedCompleted;
 
 	//killSession stuff
@@ -210,12 +243,14 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnKillSessionCompleted, bool, Response, EErrorCode, StatusCode);
 
-	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence Requests")
+	//Called when the Emergence session ends and a new WalletConnect connection can be started
+	UPROPERTY(BlueprintAssignable, Category = "Emergence|Emergence Singleton")
 	FOnKillSessionCompleted OnKillSessionCompleted;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGetAccessTokenCompleted, EErrorCode, StatusCode);
 	
-	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence Requests")
+	//Called when the user has done the last step of the login process to Emergence
+	UPROPERTY(BlueprintAssignable, Category = "Emergence|Emergence Singleton")
 	FOnGetAccessTokenCompleted OnGetAccessTokenCompleted;
 
 	//This is a hacky way of logging in via an existing access token, do not use this in production. It won't work with most methods anyway, only for testing the UI stuff (won't work with walletconnect requiring stuff).

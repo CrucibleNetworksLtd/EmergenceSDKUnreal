@@ -189,6 +189,8 @@ struct FEmergenceInventoryItem
 
     GENERATED_BODY()
 
+    TSharedPtr<FJsonValue> OriginalData;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
     FString id;
 

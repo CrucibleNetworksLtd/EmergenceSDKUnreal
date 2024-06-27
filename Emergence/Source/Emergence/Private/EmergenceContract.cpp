@@ -7,12 +7,14 @@
 UEmergenceContract::UEmergenceContract(FString _ABI)
 {
 	this->ABI = _ABI;
+	FindMethods();
 }
 
 UEmergenceContract* UEmergenceContract::CreateEmergenceContract(FString _ABI)
 {
 	UEmergenceContract* EmergenceContract = NewObject<UEmergenceContract>(UEmergenceContract::StaticClass());
 	EmergenceContract->ABI = _ABI;
+	EmergenceContract->FindMethods();
 	return EmergenceContract;
 }
 

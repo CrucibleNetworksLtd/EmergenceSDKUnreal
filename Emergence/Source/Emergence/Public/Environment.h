@@ -12,3 +12,11 @@ enum class EEmergenceEnvironment : uint8
 	Staging UMETA(ToolTip="For testing functionality before you release your game. The staging environment functions identically to production."),
 	Production UMETA(ToolTip="For when you release your game.")
 };
+
+UENUM(BlueprintType)
+enum class EFutureverseEnvironment : uint8
+{
+	Development UMETA(ToolTip = "For testing with Porcini."),
+	Staging UMETA(ToolTip = "For testing functionality before you release your game. The staging environment functions identically to production."),
+	Production UMETA(ToolTip = "For when you release your game.")
+};
