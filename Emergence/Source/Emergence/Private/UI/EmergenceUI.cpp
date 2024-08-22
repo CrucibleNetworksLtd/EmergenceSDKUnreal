@@ -4,6 +4,17 @@
 #include "UI/EmergenceUI.h"
 #include "EmergenceSingleton.h"
 
+EmergenceLoginType UEmergenceUI::GetProjectLoginType(UObject* WorldContextObject)
+{
+	auto EmergenceManger = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
+	if (EmergenceManger) {
+		return EmergenceManger->GetProjectLoginType();
+	}
+	else {
+		return EmergenceLoginType();
+	}
+}
+
 void UEmergenceUI::SetUserHasLoggedInBefore(bool HasLoggedInBefore)
 {
 	if (!GConfig) return;
@@ -64,8 +75,8 @@ bool UEmergenceUI::GetMostRecentLoadingMessage(FText& Message)
 
 void UEmergenceUI::Close()
 {
-	this->RemoveFromParent();
 	this->Closed.Broadcast();
+	this->RemoveFromParent(); //this makes this object stop existing, must come last!
 }
 
 TSoftObjectPtr<UTexture2D> UEmergenceUI::GetDefaultAvatarIcon()

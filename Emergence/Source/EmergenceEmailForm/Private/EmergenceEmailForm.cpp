@@ -196,6 +196,7 @@ void FEmergenceEmailFormModule::ActivateFormChecked(bool Force)
 	if (!DefaultActivationOccuredThisSession && ShowEmailBox) {
 		CurrentWindow = FSlateApplication::Get().AddWindowAsNativeChild(FEmergenceEmailFormModule::OnSpawnPluginTab(), FGlobalTabmanager::Get()->GetRootWindow().ToSharedRef());
 		CurrentWindow->GetOnWindowClosedEvent().AddLambda([&](const TSharedRef<SWindow>& Window) {
+			SendEmail(""); //only send the email blankly if this isn't a forced open
 			CurrentWindow = nullptr;
 		});
 		DefaultActivationOccuredThisSession = true;
@@ -204,10 +205,43 @@ void FEmergenceEmailFormModule::ActivateFormChecked(bool Force)
 
 FReply FEmergenceEmailFormModule::OnSendButtonClicked()
 {
+	SendEmail(*this->Email);
+	return FReply::Handled();
+}
+
+void FEmergenceEmailFormModule::OnEmailBoxTextChanged(const FText& Text)
+{
+	this->Email = Text.ToString();
+}
+
+void FEmergenceEmailFormModule::OnCheckboxChanged(ECheckBoxState NewState)
+{
+	if (NewState == ECheckBoxState::Checked) {
+		GConfig->SetBool(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), ShowAgainConfigName, false, GEditorIni);
+	}
+	else {
+		GConfig->SetBool(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), ShowAgainConfigName, true, GEditorIni);
+	}
+}
+
+void FEmergenceEmailFormModule::OnMapChanged(const FString& MapName, bool MapChangeFlags)
+{
+	ActivateFormChecked(false);
+	UE_LOG(LogTemp, Warning, TEXT("---------------OnMapChanged: %d"), MapChangeFlags);
+}
+
+
+void FEmergenceEmailFormModule::SendEmail_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
+{
+
+}
+
+void FEmergenceEmailFormModule::SendEmail(FString email)
+{
 	TArray<TPair<FString, FString>> Headers;
 
 	TSharedPtr<FJsonObject> TemplateParams = MakeShareable(new FJsonObject);
-	TemplateParams->SetStringField("from_email", *this->Email);
+	TemplateParams->SetStringField("from_email", email);
 	TemplateParams->SetStringField("from_engine", FGenericPlatformHttp::EscapeUserAgentString(FApp::GetBuildVersion()));
 	TemplateParams->SetStringField("from_emergenceversion", FGenericPlatformHttp::EscapeUserAgentString(UHttpHelperLibrary::GetEmergenceVersionNumber()));
 #if UNREAL_MARKETPLACE_BUILD
@@ -241,37 +275,9 @@ FReply FEmergenceEmailFormModule::OnSendButtonClicked()
 				CurrentWindow->RequestDestroyWindow();
 			}
 		}
-	});
+		});
 	HttpRequest->ProcessRequest();
 	UE_LOG(LogTemp, Display, TEXT("SendEmail request started with email %s, calling SendEmail_HttpRequestComplete on request completed"), *this->Email);
-	
-	return FReply::Handled();
-}
-
-void FEmergenceEmailFormModule::OnEmailBoxTextChanged(const FText& Text)
-{
-	this->Email = Text.ToString();
-}
-
-void FEmergenceEmailFormModule::OnCheckboxChanged(ECheckBoxState NewState)
-{
-	if (NewState == ECheckBoxState::Checked) {
-		GConfig->SetBool(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), ShowAgainConfigName, false, GEditorIni);
-	}
-	else {
-		GConfig->SetBool(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), ShowAgainConfigName, true, GEditorIni);
-	}
-}
-
-void FEmergenceEmailFormModule::OnMapChanged(const FString& MapName, bool MapChangeFlags)
-{
-	ActivateFormChecked(false);
-	UE_LOG(LogTemp, Warning, TEXT("---------------OnMapChanged: %d"), MapChangeFlags);
-}
-
-
-void FEmergenceEmailFormModule::SendEmail_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
-{
 
 }
 

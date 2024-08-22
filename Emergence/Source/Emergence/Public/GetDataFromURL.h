@@ -16,7 +16,10 @@ class EMERGENCE_API UGetDataFromUrl : public UEmergenceAsyncSingleRequestBase
 {
 	GENERATED_BODY()
 public:
-	//Takes a URL string and gets the data.
+	/**
+	 * Takes a URL string and gets the data. Can be HTTP or IPFS.
+	 * @param Url The Url to get data from. Can be HTTP or IPFS.
+	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", DisplayName="Get Data From URL", WorldContext = "WorldContextObject"), Category = "Emergence|Helpers")
 	static UGetDataFromUrl* GetDataFromUrl(UObject* WorldContextObject, const FString& Url) {
 		UGetDataFromUrl* BlueprintNode = NewObject<UGetDataFromUrl>(); //I don't know why, but every time I tried to put this in the cpp file it wouldn't link it properly and would fail to compile. If you think you can fix it, go ahead.

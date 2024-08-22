@@ -41,6 +41,9 @@ public:
 
 	UFUNCTION()
 	void SendEmail_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
+	
+	UFUNCTION()
+	void SendEmail(FString email);
 private:
 	
 	

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ErrorCodeFunctionLibrary.h"
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
+#include "JsonObjectWrapper.h"
 #include "EmergenceInventoryServiceStructs.generated.h"
 
 
@@ -188,6 +189,9 @@ struct FEmergenceInventoryItem
 {
 
     GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
+    FJsonObjectWrapper OriginalData;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Emergence|Inventory Service|Item")
     FString id;

@@ -4,7 +4,7 @@
 #include "EmergenceVRMMeshComponent.h"
 #include "UObject/UObjectGlobals.h"
 #include "LoaderBPFunctionLibrary.h"
-#include "VRMAnimInstanceCopy.h"
+#include "VrmAnimInstanceCopy.h"
 #include "UObject/ConstructorHelpers.h"
 #include "LoaderBPFunctionLibrary.h"
 #include "Engine/LatentActionManager.h"

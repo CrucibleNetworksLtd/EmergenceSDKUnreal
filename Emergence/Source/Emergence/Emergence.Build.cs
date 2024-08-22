@@ -16,8 +16,9 @@ public class Emergence : ModuleRules
 			RuntimeDependencies.Add("$(BinaryOutputDir)", "$(PluginDir)/EmergenceServer/Windows/...");
 		}
 		
-		RuntimeDependencies.Add(
-		"$(TargetOutputDir)/../../Plugins/Emergence/EmergenceDll/Win64/...");
+		if(Target.Platform == UnrealTargetPlatform.Win64){
+			RuntimeDependencies.Add("$(TargetOutputDir)/../../Plugins/Emergence/EmergenceDll/Win64/...");
+		}
 		
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		CppStandard = CppStandardVersion.Cpp17;
@@ -33,11 +34,19 @@ public class Emergence : ModuleRules
 				"Slate",
 				"SlateCore",
 				"Projects",
-				"HTTP"
-				// ... add other public dependencies that you statically link with here ...
+				"HTTP",
 			}
 		);
-			
+
+		if (Target.Version.MajorVersion >= 5 && Target.Version.MinorVersion >= 2)
+		{
+			PublicDependencyModuleNames.AddRange(
+				new string[]
+				{
+					"ApplicationCore"
+				}
+			);
+		}	
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]

@@ -24,7 +24,6 @@ public:
 	 * @param TokenID The Token ID contract we're writing metadata to.
 	 * @param Metadata The metadata to write.
 	 * @param Contract The contact that we're writing to.
-	 * @param OnlyUpdate Should we only try to update existing metadata, or write new metadata if it doesn't exist.
 	 */
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject", AuthorizationHeader = "0iKoO1V2ZG98fPETreioOyEireDTYwby"), Category = "Emergence|Inventory Service")
 	static UWriteDynamicMetadata* WriteDynamicMetadata(UObject* WorldContextObject, const FString& Network, const FString& AuthorizationHeader, const FString& Contract, const FString& TokenID, const FString& Metadata);

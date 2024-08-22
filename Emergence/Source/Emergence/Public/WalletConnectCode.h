@@ -21,7 +21,7 @@ class EMERGENCE_API UWalletConnectCode : public UImage
 	GENERATED_BODY()
 private:
 	UFUNCTION()
-	void QRCodeCompleted(UTexture2D* Icon, EErrorCode StatusCode);
+	void QRCodeCompleted(UTexture2D* Icon, FString WalletConnectString, EErrorCode StatusCode);
 
 	UFUNCTION()
 	void AccessTokenCompleted(EErrorCode StatusCode);
@@ -60,9 +60,17 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnSignInFailure OnSignInFailure;
 
-	//This is the seconds remaining until the QR code is refreshed. Use this to display to the user how long they have. In future version, the amount of time the user gets might be customisable.
+	//How long before the QR code / WalletConnect URI changes. This can be modified if users are struggling to login in the time provided. It is important to allow the login attempt to reset eventually, just in case the login gets into a "stuck state" for whatever reason. Note: this should be changed before the login attempt starts. Changing after that will have no effect.
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Time")
+	int ConnectionRefreshTime = 120;
+
+	//This is the seconds remaining until the QR code is refreshed. Use this to display to the user how long they have.
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Time")
 	int TimeRemaining = -1;
+
+	//this is a string version of the contents of the QR code. Technically, it isn't identical. The first and last parameters are reordered, as this seems to make it play more nicely with the Ledger Live desktop app.
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Wallet Connect")
+	FString WalletConnectString = "";
 
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 };

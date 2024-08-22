@@ -16,6 +16,13 @@ enum class  EmergenceConfirmationType : uint8
 	Error      UMETA(ToolTip = "To be implemented as bright red, for when you really need the users attention")
 };
 
+UENUM(BlueprintType)
+enum class EmergenceLoginType : uint8
+{
+	WalletConnect     UMETA(ToolTip = "A normal wallet connect flow."),
+	Futureverse      UMETA(ToolTip = "Login with the Futureverse version of WalletConnect. This requires the user to make a Futurepass once they connect if they don't already have one linked to that address. Useful if you're making a game with Futureverse.")
+};
+
 UCLASS(HideDropdown)
 class EMERGENCE_API UEmergenceUI : public UUserWidget
 {
@@ -26,6 +33,9 @@ private:
 public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnScreenSwitched, UUserWidget*, NewScreen);
+
+	UFUNCTION(BlueprintPure, meta = (WorldContext = "WorldContextObject"), Category = "Emergence|UI")
+	EmergenceLoginType GetProjectLoginType(UObject* WorldContextObject);
 
 	//Called whenever the screen is changed
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers|Emergence UI")
@@ -66,13 +76,13 @@ public:
 	void ShowServerErrorMessage(const EErrorCode& ErrorCode);
 
 	//Closes the EmergenceUI.
-	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|UI")
+	UFUNCTION(BlueprintCallable, Category = "Emergence|Overlay")
 	void Close();
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClosed);
 
 	//Called when the UI is closed.
-	UPROPERTY(BlueprintAssignable, Category = "Emergence Internal|UI")
+	UPROPERTY(BlueprintAssignable, Category = "Emergence|Overlay")
 	FOnClosed Closed;
 
 	//Called when the UI reaches the home screen.

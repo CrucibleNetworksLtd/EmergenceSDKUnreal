@@ -8,6 +8,7 @@
 #include "EmergenceSingleton.h"
 #include "WalletService/LoadContractInternal.h"
 #include "Templates/SharedPointer.h"
+#include "TimerManager.h"
 
 UWriteMethod* UWriteMethod::WriteMethod(UObject* WorldContextObject, UEmergenceDeployment* DeployedContract, FEmergenceContractMethod MethodName, FString Value, TArray<FString> Content, FString PrivateKey, FString GasPrice, int NumberOfConfirmations, float TimeBetweenChecks)
 {
@@ -98,13 +99,19 @@ void UWriteMethod::Activate()
 		Request->OnProcessRequestComplete().BindLambda([&](FHttpRequestPtr req, FHttpResponsePtr res, bool bSucceeded) {
 			EErrorCode StatusCode;
 			FJsonObject JsonObject = UErrorCodeFunctionLibrary::TryParseResponseAsJson(res, bSucceeded, StatusCode);
-			UE_LOG(LogEmergenceHttp, Display, TEXT("SwitchChain_HttpRequestComplete: %s"), *res->GetContentAsString());
-			if (StatusCode == EErrorCode::EmergenceOk) {
-				CallWriteMethod();
-				return;
+			if (res.IsValid()) { //this was required here for 5.4?
+				UE_LOG(LogEmergenceHttp, Display, TEXT("SwitchChain_HttpRequestComplete: %s"), *res->GetContentAsString());
+				if (StatusCode == EErrorCode::EmergenceOk) {
+					CallWriteMethod();
+					return;
+				}
+				else {
+					this->OnTransactionConfirmed.Broadcast(FEmergenceTransaction(), StatusCode);
+					return;
+				}
 			}
 			else {
-				this->OnTransactionConfirmed.Broadcast(FEmergenceTransaction(), StatusCode);
+				this->OnTransactionConfirmed.Broadcast(FEmergenceTransaction(), EErrorCode::EmergenceClientJsonParseFailed);
 				return;
 			}
 		});
@@ -151,7 +158,7 @@ void UWriteMethod::CallWriteMethod()
 	WriteMethodRequest = UHttpHelperLibrary::ExecuteHttpRequest<UWriteMethod>(
 		this,
 		&UWriteMethod::WriteMethod_HttpRequestComplete,
-		UHttpHelperLibrary::APIBase + "writeMethod?contractAddress=" + DeployedContract->Address + "&nodeUrl=" + DeployedContract->Blockchain->NodeURL + "&network=" + DeployedContract->Blockchain->Name.ToString().Replace(TEXT(" "), TEXT("")) + "&methodName=" + MethodName.MethodName + "&value=" + Value + (LocalAccountName != "" ? "&localAccountName=" + LocalAccountName : "") + GasString,
+		UHttpHelperLibrary::APIBase + "writeMethod?contractAddress=" + DeployedContract->Address + "&nodeUrl=" + DeployedContract->Blockchain->NodeURL + "&network=" + DeployedContract->Blockchain->Name.ToString().Replace(TEXT(" "), TEXT("")) + "&methodName=" + MethodName.MethodName + "&chainId=" + FString::Printf(TEXT("%lld"), DeployedContract->Blockchain->ChainID) + "&value=" + Value + (LocalAccountName != "" ? "&localAccountName=" + LocalAccountName : "") + GasString,
 		"POST",
 		300.0F, //give the user lots of time to mess around setting high gas fees
 		Headers,

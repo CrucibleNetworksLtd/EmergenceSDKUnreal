@@ -49,8 +49,6 @@ private:
 	void ConvertGIFtoPNG_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 
 	void WaitOneFrame();
-
-	static bool RawDataToBrush(FName ResourceName, const TArray<uint8>& InRawData, UTexture2D*& LoadedT2D);
 	
 	FString Url;
 	bool AllowCacheUsage;

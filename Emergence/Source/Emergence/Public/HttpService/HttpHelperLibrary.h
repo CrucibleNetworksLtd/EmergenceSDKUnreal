@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "EmergenceEVMServerSubsystem.h"
 #include "Engine/Engine.h"
+#include "Misc/EngineVersionComparison.h"
 #include "HttpHelperLibrary.generated.h"
 
 /**
@@ -52,6 +53,68 @@ public:
 
 	inline static FString GetAvatarServiceAPIURL() {		
 		return "https://" + GetAvatarServiceHostURL() + "/AvatarSystem/";
+	}
+
+	inline static FString GetFutureverseAssetRegistryAPIURL() {
+
+#if UE_BUILD_SHIPPING
+		FString Environment = "Production"; //Shipping defaults to production
+		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseShippingEnvironment"), Environment, GGameIni);
+#else
+		FString Environment = "Staging"; //Everything else defaults to staging
+		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseDevelopmentEnvironment"), Environment, GGameIni);
+#endif
+
+		if (Environment == "Production") {
+			//Production Env URL
+			return "https://ar-api.futureverse.app/graphql";
+		}
+
+		if (Environment == "Development") {
+			//Development Env URL
+			return "https://ar-api.futureverse.dev/graphql";
+		}
+
+		//Staging Env URL
+		return "https://ar-api.futureverse.cloud/graphql";
+	}
+
+	inline static FString GetFutureverseFuturepassChainId() {
+
+#if UE_BUILD_SHIPPING
+		FString Environment = "Production"; //Shipping defaults to production
+		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseDevelopmentEnvironment"), Environment, GGameIni);
+#else
+		FString Environment = "Staging"; //Everything else defaults to staging
+		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseShippingEnvironment"), Environment, GGameIni);
+#endif
+
+		if (Environment == "Production") {
+			//Production Env URL
+			return "1";
+		}
+
+		//Staging & Dev Env URL
+		return "11155111";
+	}
+
+	inline static FString GetFutureverseFuturepassAPIURL() {
+
+#if UE_BUILD_SHIPPING
+		FString Environment = "Production"; //Shipping defaults to production
+		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseDevelopmentEnvironment"), Environment, GGameIni);
+#else
+		FString Environment = "Staging"; //Everything else defaults to staging
+		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseShippingEnvironment"), Environment, GGameIni);
+#endif
+
+		if (Environment == "Production") {
+			//Production Env URL
+			return "https://account-indexer.api.futurepass.futureverse.app/api/v1";
+		}
+
+		//Staging and Dev same Env URL
+		return "https://account-indexer.api.futurepass.futureverse.dev/api/v1";
 	}
 
 	inline static FString GetPersonaAPIURL() {
@@ -152,7 +215,10 @@ public:
 		}
 	}
 
-	//Takes an IPFS URL and changes it to be a IPFS gateway link.
+	/**
+	 * Takes an IPFS URL and changes it to be a IPFS gateway link (IPFS via HTTP). If its already HTTP, no conversion happens.
+	 * @param IPFSURL The URL to try to convert. If its already HTTP, no conversion happens.
+	 */
 	UFUNCTION(BlueprintPure, Category = "Emergence|Helpers")
 	static FString IPFSURLToHTTP(FString IPFSURL) {
 		return UHttpHelperLibrary::InternalIPFSURLToHTTP(IPFSURL);
@@ -197,7 +263,9 @@ public:
 		HttpRequest->SetURL(FinalURL);
 		HttpRequest->SetVerb(Verb);
 		HttpRequest->SetTimeout(Timeout);
-		
+#if UE_VERSION_NEWER_THAN(5, 4, 0)
+		HttpRequest->SetActivityTimeout(Timeout);
+#endif
 		//Handle headers and logging of the headers
 		FString HeaderLogText;
 		if (Headers.Num() > 0) {

@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.4.0",
+	"VersionName": "0.5.0",
 	"FriendlyName": "Emergence",
 	"Description": "",
 	"Category": "Metaverse",
@@ -18,8 +18,8 @@
 	"bHasExplicitPlatforms": true,
 	"SupportedTargetPlatforms": [
 		"Win64",
-		"Win32",
-		"Mac"
+		"Mac",
+		"Linux"
 	],
 	"Modules": [
 		{
@@ -28,8 +28,8 @@
 			"LoadingPhase": "PreDefault",
 			"WhitelistPlatforms": [
 				"Win64",
-				"Win32",
-				"Mac"
+				"Mac",
+				"Linux"
 			]
 		},
 		{
@@ -38,8 +38,8 @@
 			"LoadingPhase": "Default",
 			"WhitelistPlatforms": [
 				"Win64",
-				"Win32",
-				"Mac"
+				"Mac",
+				"Linux"
 			]
 		},
 		{
@@ -48,8 +48,8 @@
 			"LoadingPhase": "Default",
 			"WhitelistPlatforms": [
 				"Win64",
-				"Win32",
-				"Mac"
+				"Mac",
+				"Linux"
 			]
 		},
 		{

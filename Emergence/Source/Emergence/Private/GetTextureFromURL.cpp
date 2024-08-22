@@ -76,7 +76,7 @@ void UGetTextureFromUrl::GetTextureFromUrl_HttpRequestComplete(FHttpRequestPtr H
 	}
 
 	UTexture2D* QRCodeTexture;
-	if (RawDataToBrush(*(FString(TEXT("QRCODE"))), ResponceBytes, QRCodeTexture)) {
+	if (UEmergenceSingleton::RawDataToBrush(*(FString(TEXT("QRCODE"))), ResponceBytes, QRCodeTexture)) {
 		OnGetTextureFromUrlCompleted.Broadcast(QRCodeTexture, EErrorCode::EmergenceOk);
 		//if we still have a world context object
 		if (WorldContextObject && WorldContextObject->IsValidLowLevel()) {
@@ -100,7 +100,7 @@ void UGetTextureFromUrl::ConvertGIFtoPNG_HttpRequestComplete(FHttpRequestPtr Htt
 	UE_LOG(LogEmergenceHttp, Display, TEXT("Convert GIF to PNG returned, turning it into a texture..."));
 	TArray<uint8> ResponceBytes = HttpResponse->GetContent();
 	UTexture2D* QRCodeTexture;
-	if (RawDataToBrush(*(FString(TEXT("QRCODE"))), ResponceBytes, QRCodeTexture)) {
+	if (UEmergenceSingleton::RawDataToBrush(*(FString(TEXT("QRCODE"))), ResponceBytes, QRCodeTexture)) {
 		OnGetTextureFromUrlCompleted.Broadcast(QRCodeTexture, EErrorCode::EmergenceOk);
 		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->DownloadedImageCache.Add(this->Url, QRCodeTexture);
 		return;
@@ -108,52 +108,6 @@ void UGetTextureFromUrl::ConvertGIFtoPNG_HttpRequestComplete(FHttpRequestPtr Htt
 	else {
 		OnGetTextureFromUrlCompleted.Broadcast(nullptr, EErrorCode::EmergenceClientFailed); //if this happens, we have no idea whats going on
 	}
-}
-
-bool UGetTextureFromUrl::RawDataToBrush(FName ResourceName, const TArray< uint8 >& InRawData, UTexture2D*& LoadedT2D)
-{
-	int32 Width;
-	int32 Height;
-
-	TArray<uint8> DecodedImage;
-	IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-	TSharedPtr<IImageWrapper> ImageWrapper;
-
-	if (InRawData.Num() == 0) { //if there is no raw data, fail out
-		return false;
-	}
-
-	if (InRawData[0] == 0x89) {
-		ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
-	}
-	else if (InRawData[0] == 0xFF && InRawData[1] == 0xD8 && InRawData[2] == 0xFF) {
-		ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::JPEG);
-	}
-	else {
-		return false;
-	}
-
-	if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(InRawData.GetData(), InRawData.Num()))
-	{
-		TArray<uint8> UncompressedBGRA;
-		if (ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, UncompressedBGRA))
-		{
-			LoadedT2D = UTexture2D::CreateTransient(ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), PF_B8G8R8A8);
-
-			if (!LoadedT2D) return false;
-
-			Width = ImageWrapper->GetWidth();
-			Height = ImageWrapper->GetHeight();
-
-			void* TextureData = LoadedT2D->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
-			FMemory::Memcpy(TextureData, UncompressedBGRA.GetData(), UncompressedBGRA.Num());
-			LoadedT2D->PlatformData->Mips[0].BulkData.Unlock();
-
-			LoadedT2D->UpdateResource();
-			return true;
-		}
-	}
-	return false;
 }
 
 void UGetTextureFromUrl::WaitOneFrame()

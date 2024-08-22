@@ -10,6 +10,7 @@
 #include "EmergenceDeployment.h"
 #include "WalletService/GetTransactionStatus.h"
 #include "Engine/EngineTypes.h"
+#include "Transaction.h"
 #include "WriteMethod.generated.h"
 
 UCLASS()
