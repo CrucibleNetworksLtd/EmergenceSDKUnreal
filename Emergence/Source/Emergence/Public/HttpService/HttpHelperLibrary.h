@@ -110,11 +110,11 @@ public:
 
 		if (Environment == "Production") {
 			//Production Env URL
-			return "https://account-indexer.api.futurepass.futureverse.app/api/v1";
+			return "https://account-indexer.pass.online/api/v1";
 		}
 
 		//Staging and Dev same Env URL
-		return "https://account-indexer.api.futurepass.futureverse.dev/api/v1";
+		return "https://account-indexer.passonline.dev/api/v1";
 	}
 
 	inline static FString GetPersonaAPIURL() {
