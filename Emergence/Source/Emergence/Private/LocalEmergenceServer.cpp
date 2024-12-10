@@ -8,7 +8,6 @@
 #if PLATFORM_WINDOWS
 #include "Windows/WindowsSystemIncludes.h"
 #include "Windows/AllowWindowsPlatformTypes.h"
-#include "Windows/prewindowsapi.h"
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -19,7 +18,6 @@
 #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
 
-#include "Windows/PostWindowsApi.h"
 #include "Windows/HideWindowsPlatformTypes.h"
 #endif
 void ULocalEmergenceServer::LaunchLocalServerProcess(bool LaunchHidden)

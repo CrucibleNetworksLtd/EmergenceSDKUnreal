@@ -65,7 +65,8 @@ enum class EErrorCode : uint8 {
 	EmergenceClientInvalidResponse = 202,
 	EmergenceClientInvalidErrorCode = 203,
 	EmergenceClientJsonParseFailed = 204,
-	EmergenceClientWrongType = 205
+	EmergenceClientWrongType = 205,
+	EmergenceClientUserRejected = 206
 };
 
 UCLASS()

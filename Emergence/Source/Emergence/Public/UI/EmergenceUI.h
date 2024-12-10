@@ -20,7 +20,7 @@ UENUM(BlueprintType)
 enum class EmergenceLoginType : uint8
 {
 	WalletConnect     UMETA(ToolTip = "A normal wallet connect flow."),
-	Futureverse      UMETA(ToolTip = "Login with the Futureverse version of WalletConnect. This requires the user to make a Futurepass once they connect if they don't already have one linked to that address. Useful if you're making a game with Futureverse.")
+	Futureverse      UMETA(ToolTip = "Login with the Futureverse version of WalletConnect, or the Futureverse web login flow. This requires the user to make a Futurepass once they connect if they don't already have one linked to that address. Useful if you're making a game with Futureverse.")
 };
 
 UCLASS(HideDropdown)

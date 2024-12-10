@@ -48,6 +48,9 @@ public:
 	void VRMLoadCompleted(int Linkage);
 
 	UPROPERTY()
+	bool IsLoading = false;
+
+	UPROPERTY()
 	UVrmAssetListObject* VrmAssetListObject;
 
 	UPROPERTY()

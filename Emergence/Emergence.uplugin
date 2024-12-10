@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.5.1",
+	"VersionName": "0.5.2.1",
 	"FriendlyName": "Emergence",
 	"Description": "",
 	"Category": "Metaverse",
@@ -9,8 +9,8 @@
 	"CreatedByURL": "https://crucible.network/",
 	"DocsURL": "https://docs.openmetadao.com/",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/2a2ac549e90440b59cc331c53de19e88",
-	"SupportURL": "https://discord.gg/openmeta",
-	"EngineVersion": "5.1",
+	"SupportURL": "https://discord.gg/openmetadao",
+	"EngineVersion": "5.4",
 	"CanContainContent": true,
 	"IsBetaVersion": true,
 	"IsExperimentalVersion": false,
@@ -56,6 +56,27 @@
 			"Name": "EmergenceEmailForm",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "JwtVerifier",
+			"Type": "Runtime",
+			"LoadingPhase": "PreLoadingScreen",
+			"PlatformAllowList": [
+				"Win64",
+				"Linux",
+			],
+			"WhitelistPlatforms": [
+				"Win64",
+				"Linux",
+			]
+		},
+		{
+			"Name": "HashSHA256",
+			"Type": "Runtime",
+			"LoadingPhase": "PreLoadingScreen",
+			"WhitelistPlatforms": [
+				"Win64"
+			]
 		}
 	]
 }

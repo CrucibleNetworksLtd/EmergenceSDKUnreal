@@ -42,7 +42,7 @@ UCLASS()
 class EMERGENCE_API UGetFutureverseAssetTree : public UEmergenceAsyncSingleRequestBase
 {
 	GENERATED_BODY()
-	
+public:
 	/**
 	 * Gets the Asset Tree associated with a specific asset.
 	 * @param TokenId The interger ID of the token you want to get the Asset Tree of. For example: "473" (without quotes).

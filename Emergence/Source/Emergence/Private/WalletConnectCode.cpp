@@ -6,8 +6,11 @@
 TSharedRef<SWidget> UWalletConnectCode::RebuildWidget() {
 	Singleton = UEmergenceSingleton::GetEmergenceManager(this->GetOwningPlayer());
 	if (Singleton) {
+		//start the ticking for the countdown timer. Keep in mind, this is visual ONLY and doesn't affact the requests themselves
 		this->GetOwningPlayer()->GetWorld()->GetTimerManager().SetTimer(TimeRemainingTimerHandle, this, &UWalletConnectCode::UpdateTimeRemaining, 1.0F, true, 1.0F);
-		this->StartAttempt();
+		if (ActivateOnConstruct) {
+			this->StartAttempt();
+		}
 	}
 	return Super::RebuildWidget();
 }
@@ -26,7 +29,7 @@ void UWalletConnectCode::QRCodeCompleted(UTexture2D* _Icon, FString _WalletConne
 }
 
 void UWalletConnectCode::AccessTokenCompleted(EErrorCode StatusCode) {
-	Singleton->OnGetAccessTokenCompleted.RemoveDynamic(this, &UWalletConnectCode::AccessTokenCompleted);
+	Singleton->OnLoginFinished.RemoveDynamic(this, &UWalletConnectCode::AccessTokenCompleted);
 	if (StatusCode == EErrorCode::EmergenceOk) { //EVERYTHING IS DONE, CLEANUP AND SAY SUCCESS
 		this->GetOwningPlayer()->GetWorld()->GetTimerManager().ClearTimer(TimeRemainingTimerHandle);
 		Singleton->OnGetHandshakeCompleted.RemoveDynamic(this, &UWalletConnectCode::GetHandshakeCompleted);
@@ -56,17 +59,32 @@ void UWalletConnectCode::GetHandshakeCompleted(FString Address, EErrorCode Statu
 	}
 }
 
+void UWalletConnectCode::CancelAll()
+{
+	Singleton->CancelSignInRequest();
+	this->GetOwningPlayer()->GetWorld()->GetTimerManager().ClearTimer(TimeRemainingTimerHandle);
+}
+
+void UWalletConnectCode::StartAll()
+{
+	Singleton = UEmergenceSingleton::GetEmergenceManager(this->GetOwningPlayer());
+	if (Singleton) {
+		this->GetOwningPlayer()->GetWorld()->GetTimerManager().SetTimer(TimeRemainingTimerHandle, this, &UWalletConnectCode::UpdateTimeRemaining, 1.0F, true, 1.0F);
+		this->StartAttempt();
+	}
+}
+
 void UWalletConnectCode::StartAttempt()
 {
 	this->TimeRemaining = ConnectionRefreshTime;
 
 	Singleton->OnGetQRCodeCompleted.RemoveDynamic(this, &UWalletConnectCode::QRCodeCompleted);
-	Singleton->OnGetAccessTokenCompleted.RemoveDynamic(this, &UWalletConnectCode::AccessTokenCompleted);
+	Singleton->OnLoginFinished.RemoveDynamic(this, &UWalletConnectCode::AccessTokenCompleted);
 	Singleton->OnGetHandshakeCompleted.RemoveDynamic(this, &UWalletConnectCode::GetHandshakeCompleted);
 
 	Singleton->OnGetQRCodeCompleted.AddDynamic(this, &UWalletConnectCode::QRCodeCompleted);
 	Singleton->GetQRCode();
-	Singleton->OnGetAccessTokenCompleted.AddDynamic(this, &UWalletConnectCode::AccessTokenCompleted);	
+	Singleton->OnLoginFinished.AddDynamic(this, &UWalletConnectCode::AccessTokenCompleted);	
 	Singleton->OnGetHandshakeCompleted.AddDynamic(this, &UWalletConnectCode::GetHandshakeCompleted);
 }
 

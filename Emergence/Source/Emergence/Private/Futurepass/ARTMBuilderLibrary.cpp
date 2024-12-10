@@ -1,11 +1,11 @@
 // Copyright Crucible Networks Ltd 2024. All Rights Reserved.
 
-
 #include "Futurepass/ARTMBuilderLibrary.h"
+#include "Emergence.h"
 
 FString UARTMBuilderLibrary::GenerateARTM(FString Message, TArray<FFutureverseARTMOperation> ARTMOperations, FString Address, FString Nonce)
 {
-    UE_LOG(LogTemp, Display, TEXT("Generating ARTM with message %s, %d operations, for address %s, with nonce %s"), *Message, ARTMOperations.Num(), *Address, *Nonce);
+    UE_LOG(LogEmergence, Display, TEXT("Generating ARTM with message %s, %d operations, for address %s, with nonce %s"), *Message, ARTMOperations.Num(), *Address, *Nonce);
     TMap< EFutureverseARTMOperationType, FString> OperationTypeStrings = {
         {EFutureverseARTMOperationType::CREATELINK, "asset-link create"},
         {EFutureverseARTMOperationType::DELETELINK, "asset-link delete"}
@@ -21,7 +21,7 @@ FString UARTMBuilderLibrary::GenerateARTM(FString Message, TArray<FFutureverseAR
         TArray<FString> Array;
         Operation.Slot.ParseIntoArray(Array, TEXT(":"), false);
         if((Array.Num() == 0) || Array.Last(0).IsEmpty() || Operation.LinkA.IsEmpty() || Operation.LinkB.IsEmpty()){
-            UE_LOG(LogTemp, Error, TEXT("Error parsing ARTM Operation!"));
+            UE_LOG(LogEmergence, Error, TEXT("Error parsing ARTM Operation!"));
             continue;
         }
         ARTM += *OperationTypeStrings.Find(Operation.OperationType) + "\n";

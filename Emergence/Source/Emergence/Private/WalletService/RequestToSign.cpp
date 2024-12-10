@@ -18,17 +18,45 @@ URequestToSign* URequestToSign::RequestToSign(UObject* WorldContextObject, const
 
 void URequestToSign::Activate()
 {
-	FString Content = "{\"message\": \"" + MessageToSign + "\"}";
-	TArray<TPair<FString, FString>> Headers;
-	Headers.Add(TPair<FString, FString>("Content-Type", "application/json"));
-	Headers.Add(TPair<FString, FString>("accept", "text/plain"));
 	auto Singleton = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
-	if (!Singleton->DeviceID.IsEmpty()) { //we need to send the device ID if we have one, we won't have one for local EVM servers
-		Headers.Add(TPair<FString, FString>("deviceId", Singleton->DeviceID));
+	
+	//"Web login" flow stuff
+	if (Singleton->UsingWebLoginFlow) {
+		MessageToSign.ReplaceInline(TEXT("\\\""), TEXT("\"")); //unescape double layered json
+		CustodialSignMessage = UCustodialSignMessage::CustodialSignMessage(WorldContextObject, Singleton->GetCachedAddress(true), MessageToSign);
+		CustodialSignMessage->OnCustodialSignMessageComplete.BindLambda([&](const FString SignedMessage, EErrorCode StatusCode){
+			if (StatusCode == EErrorCode::EmergenceOk) {
+				UE_LOG(LogEmergence, Display, TEXT("OnInternalCustodialSignMessageComplete sucessfully"));
+				OnRequestToSignCompleted.Broadcast(SignedMessage, StatusCode);
+			}
+			else {
+				OnRequestToSignCompleted.Broadcast("", StatusCode);
+				UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("RequestToSign", StatusCode);
+			}
+			SetReadyToDestroy();
+		});
+		CustodialSignMessage->Activate();
+		UE_LOG(LogEmergenceHttp, Display, TEXT("RequestToSign request started via web login flow, calling OnInternalCustodialSignMessageComplete on request completed"));
 	}
+	//wallet connect flow
+	else {
+		FString Content = "{\"message\": \"" + MessageToSign + "\"}";
+		TArray<TPair<FString, FString>> Headers;
+		Headers.Add(TPair<FString, FString>("Content-Type", "application/json"));
+		Headers.Add(TPair<FString, FString>("accept", "text/plain"));
 
-	Request = UHttpHelperLibrary::ExecuteHttpRequest<URequestToSign>(this, &URequestToSign::RequestToSign_HttpRequestComplete, UHttpHelperLibrary::APIBase + "request-to-sign", "POST", 60.0F, Headers, Content);
-	UE_LOG(LogEmergenceHttp, Display, TEXT("RequestToSign request started, calling RequestToSign_HttpRequestComplete on request completed"));
+		if (!Singleton->DeviceID.IsEmpty()) { //we need to send the device ID if we have one, we won't have one for local EVM servers
+			Headers.Add(TPair<FString, FString>("deviceId", Singleton->DeviceID));
+		}
+
+		Request = UHttpHelperLibrary::ExecuteHttpRequest<URequestToSign>(this, &URequestToSign::RequestToSign_HttpRequestComplete, UHttpHelperLibrary::APIBase + "request-to-sign", "POST", 60.0F, Headers, Content);
+		UE_LOG(LogEmergenceHttp, Display, TEXT("RequestToSign request started, calling RequestToSign_HttpRequestComplete on request completed"));
+	}
+}
+
+void URequestToSign::BeginDestroy()
+{
+	UEmergenceAsyncSingleRequestBase::BeginDestroy();
 }
 
 void URequestToSign::RequestToSign_HttpRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
@@ -52,4 +80,9 @@ void URequestToSign::RequestToSign_HttpRequestComplete(FHttpRequestPtr HttpReque
 		UEmergenceSingleton::GetEmergenceManager(WorldContextObject)->CallRequestError("RequestToSign", StatusCode);
 	}
 	SetReadyToDestroy();
+}
+
+void URequestToSign::OnInternalCustodialSignMessageComplete(const FString SignedMessage, EErrorCode StatusCode)
+{
+
 }

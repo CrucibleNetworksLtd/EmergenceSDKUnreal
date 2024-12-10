@@ -57,7 +57,13 @@ void UEmergenceVRMMeshComponent::ActivateVRMMeshFromData(const TArray<uint8>& Da
 		}
 	}
 
-	ULoaderBPFunctionLibrary::LoadVRMFromMemoryAsync(this->GetOwner(), VrmAssetListObject, OutVrmAsset, Data, OptionForRuntimeLoad, LatentInfo);
+	if (!IsLoading) {
+		IsLoading = true;
+		ULoaderBPFunctionLibrary::LoadVRMFromMemoryAsync(this->GetOwner(), VrmAssetListObject, OutVrmAsset, Data, OptionForRuntimeLoad, LatentInfo);
+	}
+	else {
+		UE_LOG(LogAnimation, Error, TEXT("Tried to start loading a VRM while there is a VRM load in progress."));
+	}
 }
 
 const EEmergenceVRMImportMaterialType UEmergenceVRMMeshComponent::MaterialTypeFromString(const FString MaterialString)
@@ -109,4 +115,5 @@ void UEmergenceVRMMeshComponent::VRMLoadCompleted(int Linkage)
 	if (ParentSkeletalMesh->GetAnimInstance()) {
 		Cast<UVrmAnimInstanceCopy>(ParentSkeletalMesh->GetAnimInstance())->SetSkeletalMeshCopyData(OutVrmAsset, this, nullptr, VRoidSimpleAssetList, nullptr);
 	}
+	IsLoading = false;
 }

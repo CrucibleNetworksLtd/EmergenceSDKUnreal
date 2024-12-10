@@ -18,6 +18,8 @@
 #include "Brushes/SlateDynamicImageBrush.h"
 #include "Futurepass/GetLinkedFuturepassInformation.h"
 #include "Environment.h"
+#include "WebLogin/CustodialLogin.h"
+#include "WalletService/RequestToSign.h"
 #include "EmergenceSingleton.generated.h"
 
 #pragma warning( push )
@@ -35,7 +37,7 @@ public:
 	inline static T StringToEnum(const FString& Name) {
 		UEnum* EnumClass = StaticEnum<T>();
 		if (!EnumClass) {
-			UE_LOG(LogTemp, Fatal, TEXT("StringToEnum Enum not found: %s"), *Name);
+			UE_LOG(LogEmergence, Fatal, TEXT("StringToEnum Enum not found: %s"), *Name);
 		}
 		return (T)EnumClass->GetIndexByName(FName(*Name), EGetByNameFlags::ErrorIfNotFound);
 	}
@@ -48,12 +50,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|Overlay Methods", meta = (WorldContext = "ContextObject"))
 	static UEmergenceSingleton* ForceInitialize(const UObject* ContextObject);
 
+	/** Force initialize the emergence manager, this shouldn't be nessacery. Just a version of GetEmergenceManager with an execute input.  */
+	UFUNCTION()
+	void CompleteLoginViaWebLoginFlow(const FEmergenceCustodialLoginOutput LoginData, EErrorCode ErrorCode);
+
 	void Init();
 	void Shutdown();
 
 	void SetGameInstance(UGameInstance* GameInstance) { OwningGameInstance = GameInstance; }
 
 	void SetCachedCurrentPersona(FEmergencePersona NewCachedCurrentPersona);
+
+	UFUNCTION()
+	void OnRequestToSignForAccessTokenComplete(FString SignedMessage, EErrorCode StatusCode);
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCustodialLoginCompleted, FEmergenceCustodialLoginOutput, TokenData, EErrorCode, StatusCode);
+
+	UPROPERTY()
+	FOnCustodialLoginCompleted OnWebLoginCompleted;
 
 	UFUNCTION(BlueprintPure, Category = "Emergence Internal|Overlay Methods")
 	static EFutureverseEnvironment GetFutureverseEnvironment();
@@ -77,6 +91,17 @@ public:
 	//Is FuturepassInfoCache valid?
 	UPROPERTY(BlueprintReadOnly, Category = "Emergence|Futureverse")
 	bool FuturepassInfoCacheIsSet = false;
+
+	//Are we logged in via a web login flow, rather than WC
+	UPROPERTY(BlueprintReadOnly, Category = "Emergence|Login Flow")
+	bool UsingWebLoginFlow = false;
+
+	//Should we use the access token system, which is required by the Emergence Overlay, or skip it?
+	UPROPERTY(BlueprintReadWrite, Category = "Emergence|Login Flow")
+	bool UseAccessToken = true;
+
+	UPROPERTY()
+	FString AccessTokenTimestamp;
 
 	UPROPERTY()
 	FString DeviceID;
@@ -186,7 +211,7 @@ public:
 
 	//Returns the last wallet connected address (if GetHandshake has been called already) If we don't have one yet, returns "-1".
 	UFUNCTION(BlueprintPure, Category = "Emergence|Emergence Singleton")
-	FString GetCachedAddress();
+	FString GetCachedAddress(bool Checksummed = false);
 
 	UFUNCTION()
 	FString GetCachedChecksummedAddress();
@@ -256,17 +281,17 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnKillSessionCompleted, bool, Response, EErrorCode, StatusCode);
 
-	//Called when the Emergence session ends and a new WalletConnect connection can be started
+	//Called when the Emergence session ends and a new WalletConnect / Futureverse custodial wallet connection can be started
 	UPROPERTY(BlueprintAssignable, Category = "Emergence|Emergence Singleton")
 	FOnKillSessionCompleted OnKillSessionCompleted;
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGetAccessTokenCompleted, EErrorCode, StatusCode);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoginFinished, EErrorCode, StatusCode);
 	
-	//Called when the user has done the last step of the login process to Emergence
+	//Called when the user has done the last step of a login process, or the process has had an error that causes it to finish.
 	UPROPERTY(BlueprintAssignable, Category = "Emergence|Emergence Singleton")
-	FOnGetAccessTokenCompleted OnGetAccessTokenCompleted;
+	FOnLoginFinished OnLoginFinished;
 
-	//This is a hacky way of logging in via an existing access token, do not use this in production. It won't work with most methods anyway, only for testing the UI stuff (won't work with walletconnect requiring stuff).
+	//This is a hacky way of logging in via an existing access token, do not use this in production. It won't work with most methods anyway, only for testing the UI stuff (won't work with walletconnect / Futureverse custodial wallet requiring stuff).
 	UFUNCTION(BlueprintCallable, Category = "Emergence Internal|Debug Commands")
 	void ForceLoginViaAccessToken(FString AccessToken);
 
@@ -277,8 +302,12 @@ public:
 	UFUNCTION()
 	void OnOverlayClosed();
 
-private:
+	UPROPERTY()
+	URequestToSign* RequestToSign;
+
 	static TMap<TWeakObjectPtr<UGameInstance>, TWeakObjectPtr<UEmergenceSingleton>> GlobalManagers;
+private:
+	
 	TWeakObjectPtr<UGameInstance> OwningGameInstance;
 
 	bool PreviousMouseShowState;

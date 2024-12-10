@@ -9,6 +9,7 @@
 #include "WalletService/LoadContractInternal.h"
 #include "Templates/SharedPointer.h"
 #include "TimerManager.h"
+#include "WebLogin/CustodialWriteTransaction.h"
 
 UWriteMethod* UWriteMethod::WriteMethod(UObject* WorldContextObject, UEmergenceDeployment* DeployedContract, FEmergenceContractMethod MethodName, FString Value, TArray<FString> Content, FString PrivateKey, FString GasPrice, int NumberOfConfirmations, float TimeBetweenChecks)
 {
@@ -51,7 +52,16 @@ void UWriteMethod::Activate()
 	UEmergenceSingleton* Singleton = UEmergenceSingleton::GetEmergenceManager(WorldContextObject);
 
 	if (this->LocalAccountName.IsEmpty() && !Singleton->HasAccessToken()) {
-		UE_LOG(LogEmergenceHttp, Error, TEXT("If you aren't using a local wallet you need to have connected with WalletConnect to use WriteMethod!"));
+		UE_LOG(LogEmergenceHttp, Error, TEXT("If you aren't using a local wallet you need to have connected with WalletConnect / FV Web Login to use WriteMethod!"));
+		return;
+	}
+
+	//"Web login" flow stuff
+	if (Singleton->UsingWebLoginFlow) {
+		UCustodialWriteTransaction* CustodialWriteTransaction = UCustodialWriteTransaction::CustodialWriteTransaction(
+			WorldContextObject, DeployedContract, MethodName.MethodName, Value, Content);
+		CustodialWriteTransaction->OnCustodialWriteTransactionCompleted.AddDynamic(this, &UWriteMethod::CustodialWriteTransactionCompleted);
+		CustodialWriteTransaction->Activate();
 		return;
 	}
 
@@ -240,6 +250,19 @@ void UWriteMethod::GetTransactionStatus()
 	UGetTransactionStatus* TransactionStatusCall = UGetTransactionStatus::GetTransactionStatus(this->WorldContextObject, this->TransactionHash, this->DeployedContract->Blockchain);
 	TransactionStatusCall->OnGetTransactionStatusCompleted.AddDynamic(this, &UWriteMethod::TransactionStatusReturns);
 	TransactionStatusCall->Activate();
+}
+
+void UWriteMethod::CustodialWriteTransactionCompleted(FString Hash, EErrorCode StatusCode)
+{
+	if (StatusCode == EErrorCode::EmergenceOk) {
+		this->TransactionHash = Hash;
+		GetTransactionStatus();
+		OnTransactionSent.Broadcast();
+	}
+	else {
+		UE_LOG(LogEmergence, Warning, TEXT("CustodialWriteTransactionCompleted: Failed"));
+		this->OnTransactionConfirmed.Broadcast(FString(), StatusCode);
+	}
 }
 
 void UWriteMethod::TransactionStatusReturns(FEmergenceTransaction Transaction, EErrorCode StatusCode)

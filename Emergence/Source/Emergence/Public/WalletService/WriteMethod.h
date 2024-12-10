@@ -24,7 +24,7 @@ public:
 	 * @param MethodName The method to call.
 	 * @param Value The amount to transfer from sender to recipient (in Wei, or equivelent).
 	 * @param Content The parameters to call the method with.
-	 * @param PrivateKey (Optional) The private key of the account to call the method with. Leave blank to call with the WalletConnect'd wallet.
+	 * @param PrivateKey (Optional) The private key of the account to call the method with. Leave blank to call with the WalletConnect'd wallet / Futureverse custodial wallet.
 	 * @param GasPrice (Optional) The gas price to use if we're calling with a local account.
 	 * @param NumberOfConfirmations The number of confirmations to wait for before deciding this transaction "confirmed".
 	 * @param TimeBetweenChecks The amount of time between checks in seconds.
@@ -75,6 +75,9 @@ private:
 
 	UFUNCTION()
 	void GetTransactionStatus();
+
+	UFUNCTION()
+	void CustodialWriteTransactionCompleted(FString TransactionHash, EErrorCode StatusCode);
 
 	UFUNCTION()
 	void TransactionStatusReturns(FEmergenceTransaction Transaction, EErrorCode StatusCode);

@@ -21,7 +21,7 @@ void UGetFuturepassInventory::Activate() {
 		AddressString = AddressString + "\"" + Addresses[i] + "\"";
 	}
 
-	FString Content = R"({"query":"query Asset($addresses: [ChainAddress!]!, $first: Float) {\r\n  assets(addresses: $addresses, first: $first) {\r\n    edges {\r\n      node {\r\n        metadata {\r\n          properties\r\n          attributes\r\n        }\r\n        collection {\r\n          chainId\r\n          chainType\r\n          location\r\n          name\r\n        }\r\ntokenId\r\ncollectionId      }\r\n    }\r\n  }\r\n}","variables":{"addresses":[)" + AddressString + R"(], "first": 1000 }})";
+	FString Content = R"({"query":"query Asset($addresses: [ChainAddress!]!, $first: Float) {\r\n  assets(addresses: $addresses, first: $first) {\r\n    edges {\r\n      node {\r\n        metadata {\r\n          properties\r\n          attributes\r\n        rawAttributes\r\n}\r\n        collection {\r\n          chainId\r\n          chainType\r\n          location\r\n          name\r\n        }\r\ntokenId\r\ncollectionId      }\r\n    }\r\n  }\r\n}","variables":{"addresses":[)" + AddressString + R"(], "first": 1000 }})";
 	Request = UHttpHelperLibrary::ExecuteHttpRequest<UGetFuturepassInventory>(
 		this,
 		nullptr,

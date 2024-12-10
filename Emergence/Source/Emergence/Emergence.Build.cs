@@ -1,6 +1,7 @@
 // Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 using UnrealBuildTool;
+using System.IO;
 
 public class Emergence : ModuleRules
 {
@@ -35,6 +36,17 @@ public class Emergence : ModuleRules
 				"SlateCore",
 				"Projects",
 				"HTTP",
+				"OpenSSL",
+			}
+		);
+		
+		PrivateDependencyModuleNames.AddRange(
+			new string[]
+			{
+				"CoreUObject",
+				"Engine",
+				"SlateCore",
+				"Json"	
 			}
 		);
 
@@ -48,14 +60,13 @@ public class Emergence : ModuleRules
 			);
 		}	
 		
-		PrivateDependencyModuleNames.AddRange(
+		//Stuff added for WebLogin
+		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
-				"Engine",
-				"SlateCore",
-				"Json"
-				// ... add private dependencies that you statically link with here ...	
+				"HTTPServer",
+				"JwtVerifier",
+				"HashSHA256"
 			}
 		);
 	}

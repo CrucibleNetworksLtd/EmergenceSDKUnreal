@@ -14,6 +14,7 @@
 #include "EmergenceEVMServerSubsystem.h"
 #include "Engine/Engine.h"
 #include "Misc/EngineVersionComparison.h"
+#include "HttpServerModule.h"
 #include "HttpHelperLibrary.generated.h"
 
 /**
@@ -47,6 +48,22 @@ public:
 		}
 	}
 
+	inline static FString GetFVEnvironment() {
+#if UE_BUILD_SHIPPING
+		FString Environment = "Production"; //Shipping defaults to production
+		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseShippingEnvironment"), Environment, GGameIni);
+#else
+		FString Environment = "Production"; //Everything else defaults to Production as well
+		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseDevelopmentEnvironment"), Environment, GGameIni);
+#endif
+		return Environment;
+	}
+
+	//Our service for helping sending custodial transactions
+	inline static FString GetFVHelperServiceURL() {
+		return "https://fvhelperservice.openmeta.xyz/";
+	}
+
 	inline static FString GetInventoryServiceAPIURL() {
 		return "https://" + GetInventoryServiceHostURL() + "/InventoryService/";
 	}
@@ -55,15 +72,25 @@ public:
 		return "https://" + GetAvatarServiceHostURL() + "/AvatarSystem/";
 	}
 
+	//The URL to send the user to to create a futurepass depending on environment
+	UFUNCTION(BlueprintPure, Category="Emergence Internal|UI")
+	static FString GetFutureverseCreateFuturepassURL() {
+
+		FString Environment = GetFVEnvironment();
+
+		if (Environment == "Production") {
+			//Production Env URL
+			return "https://futurepass.futureverse.app/";
+		}
+
+		//Staging Env URL
+		return "https://identity-dashboard.futureverse.cloud/";
+	}
+
+	//the graphQL of the futureverse asset registery depending on environment
 	inline static FString GetFutureverseAssetRegistryAPIURL() {
 
-#if UE_BUILD_SHIPPING
-		FString Environment = "Production"; //Shipping defaults to production
-		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseShippingEnvironment"), Environment, GGameIni);
-#else
-		FString Environment = "Staging"; //Everything else defaults to staging
-		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseDevelopmentEnvironment"), Environment, GGameIni);
-#endif
+		FString Environment = GetFVEnvironment();
 
 		if (Environment == "Production") {
 			//Production Env URL
@@ -79,15 +106,10 @@ public:
 		return "https://ar-api.futureverse.cloud/graphql";
 	}
 
+	//the chain id to use with futurepasses depending on environment
 	inline static FString GetFutureverseFuturepassChainId() {
 
-#if UE_BUILD_SHIPPING
-		FString Environment = "Production"; //Shipping defaults to production
-		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseDevelopmentEnvironment"), Environment, GGameIni);
-#else
-		FString Environment = "Staging"; //Everything else defaults to staging
-		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseShippingEnvironment"), Environment, GGameIni);
-#endif
+		FString Environment = GetFVEnvironment();
 
 		if (Environment == "Production") {
 			//Production Env URL
@@ -98,15 +120,10 @@ public:
 		return "11155111";
 	}
 
+	//the location of the futurepass API  depending on environment
 	inline static FString GetFutureverseFuturepassAPIURL() {
 
-#if UE_BUILD_SHIPPING
-		FString Environment = "Production"; //Shipping defaults to production
-		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseDevelopmentEnvironment"), Environment, GGameIni);
-#else
-		FString Environment = "Staging"; //Everything else defaults to staging
-		GConfig->GetString(TEXT("/Script/EmergenceEditor.EmergencePluginSettings"), TEXT("FutureverseShippingEnvironment"), Environment, GGameIni);
-#endif
+		FString Environment = GetFVEnvironment();
 
 		if (Environment == "Production") {
 			//Production Env URL
@@ -117,6 +134,33 @@ public:
 		return "https://account-indexer.passonline.dev/api/v1";
 	}
 
+	//the futureverse signer url depending on environment
+	inline static FString GetFutureverseSignerURL() {
+		
+		FString Environment = GetFVEnvironment();
+
+		if (Environment == "Production") {
+			return TEXT("https://signer.pass.online");
+		}
+		else {
+			return TEXT("https://signer.passonline.cloud");
+		}
+	}
+
+	//the futureverse auth url depending on environment
+	inline static FString GetFutureverseAuthURL() {
+
+		FString Environment = GetFVEnvironment();
+
+		if (Environment == "Production") {
+			return TEXT("https://login.pass.online");
+		}
+		else {
+			return TEXT("https://login.passonline.cloud");
+		}
+	}
+
+	//our persona API depending on environment
 	inline static FString GetPersonaAPIURL() {
 
 #if UE_BUILD_SHIPPING
@@ -141,6 +185,7 @@ public:
 		return "https://x8iq9e5fq1.execute-api.us-east-1.amazonaws.com/staging/";
 	}
 
+	//our inventory service depending on environment
 	inline static FString GetInventoryServiceHostURL() {
 
 #if UE_BUILD_SHIPPING
@@ -165,6 +210,7 @@ public:
 		return "dysaw5zhak.us-east-1.awsapprunner.com";
 	}
 
+	//our avatar service depending on environment
 	inline static FString GetAvatarServiceHostURL() {
 
 #if UE_BUILD_SHIPPING
@@ -223,6 +269,57 @@ public:
 	static FString IPFSURLToHTTP(FString IPFSURL) {
 		return UHttpHelperLibrary::InternalIPFSURLToHTTP(IPFSURL);
 	}
+
+	static void RequestPrint(const FHttpServerRequest& Req, bool PrintBody = true)
+	{
+		FString strRequestType;
+		switch (Req.Verb)
+		{
+		case EHttpServerRequestVerbs::VERB_GET:
+			strRequestType = TEXT("GET");
+			break;
+		case EHttpServerRequestVerbs::VERB_POST:
+			strRequestType = TEXT("POST");
+			break;
+		case EHttpServerRequestVerbs::VERB_PUT:
+			strRequestType = TEXT("PUT");
+			break;
+		default:
+			strRequestType = TEXT("Invalid");
+		}
+		UE_LOG(LogEmergenceHttp, Log, TEXT("RequestType = '%s'"), *strRequestType);
+
+		HttpVersion::EHttpServerHttpVersion httpVersion{ Req.HttpVersion };
+		UE_LOG(LogEmergenceHttp, Log, TEXT("HttpVersion = '%s'"), *HttpVersion::ToString(httpVersion));
+
+		UE_LOG(LogEmergenceHttp, Log, TEXT("RelativePath = '%s'"), *Req.RelativePath.GetPath());
+
+		for (const auto& header : Req.Headers)
+		{
+			FString strHeaderVals;
+			for (const auto& val : header.Value)
+			{
+				strHeaderVals += "'" + val + "' ";
+			}
+			UE_LOG(LogEmergenceHttp, Log, TEXT("Header = '%s' : %s"), *header.Key, *strHeaderVals);
+		}
+
+		for (const auto& pathParam : Req.PathParams)
+		{
+			UE_LOG(LogEmergenceHttp, Log, TEXT("PathParam = '%s' : '%s'"), *pathParam.Key, *pathParam.Value);
+		}
+
+		for (const auto& queryParam : Req.QueryParams)
+		{
+			UE_LOG(LogEmergenceHttp, Log, TEXT("QueryParam = '%s' : '%s'"), *queryParam.Key, *queryParam.Value);
+		}
+
+		// Convert UTF8 to FString
+		FUTF8ToTCHAR bodyTCHARData(reinterpret_cast<const ANSICHAR*>(Req.Body.GetData()), Req.Body.Num());
+		FString strBodyData{ bodyTCHARData.Length(), bodyTCHARData.Get() };
+
+		UE_LOG(LogEmergenceHttp, Log, TEXT("Body = '%s'"), *strBodyData);
+	};
 
 	template<typename T>
 	inline static TSharedRef<IHttpRequest, ESPMode::ThreadSafe> ExecuteHttpRequest(T* FunctionBindObject, void(T::* FunctionBindFunction)(FHttpRequestPtr, FHttpResponsePtr, bool), const FString& URL, const FString& Verb = TEXT("GET"), const float& Timeout = 60.0F, const TArray<TPair<FString, FString>>& Headers = TArray<TPair<FString, FString>>(), const FString& Content = FString(), const bool ProcessRequestInstantly = true)

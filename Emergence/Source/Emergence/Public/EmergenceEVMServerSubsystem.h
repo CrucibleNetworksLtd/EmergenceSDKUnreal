@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Interfaces/IHttpRequest.h"
+#include "HttpRouteHandle.h"
 #include "EmergenceEVMServerSubsystem.generated.h"
 
 /**

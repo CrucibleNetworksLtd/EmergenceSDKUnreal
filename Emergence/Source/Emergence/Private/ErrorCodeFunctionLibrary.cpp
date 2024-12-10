@@ -53,6 +53,7 @@ const TMap <int32, EErrorCode> UErrorCodeFunctionLibrary::StatusCodeIntToErrorCo
 	{-3, EErrorCode::EmergenceClientInvalidErrorCode},
 	{-4, EErrorCode::EmergenceClientJsonParseFailed},
 	{-5, EErrorCode::EmergenceClientWrongType},
+	{-6, EErrorCode::EmergenceClientUserRejected},
 	{512, EErrorCode::EmergenceInternalError}
 };
 

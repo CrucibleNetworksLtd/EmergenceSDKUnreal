@@ -29,11 +29,19 @@ public:
 
 	//Which Futureverse cloud environment should be communicated with when the game is built as "Debug", "Development" or "Test". Default is "Staging".
 	UPROPERTY(config, EditAnywhere, Category = "Futureverse", meta = (DisplayName = "Debug/Development/Test build Futureverse cloud environment"))
-	EFutureverseEnvironment FutureverseDevelopmentEnvironment = EFutureverseEnvironment::Development;
+	EFutureverseEnvironment FutureverseDevelopmentEnvironment = EFutureverseEnvironment::Production;
 
 	//Which Futureverse cloud environment should be communicated with when the game is built as "Shipping". Default is "Production".
 	UPROPERTY(config, EditAnywhere, Category = "Futureverse", meta = (DisplayName = "Shipping build Futureverse cloud environment"))
 	EFutureverseEnvironment FutureverseShippingEnvironment = EFutureverseEnvironment::Production;
+
+	//A custom client ID to use with the Futureverse web login flow on the Futureverse Production Environment. One of these can be created at https://login.futureverse.app/manageclients
+	UPROPERTY(config, EditAnywhere, Category = "Futureverse")
+	FString FutureverseWebLoginProductionEnvClientID = "";
+
+	//A custom client ID to use with the Futureverse web login flow on the Futureverse Development / Staging Environments. One of these can be created at https://login.futureverse.cloud/manageclients
+	UPROPERTY(config, EditAnywhere, Category = "Futureverse")
+	FString FutureverseWebLoginStagingEnvClientID = "";
 	
 	//For Crucible use only! Enable the development environment. Not to be confused with the development build of the game.
 	UPROPERTY(AdvancedDisplay, config, EditAnywhere, Category = "General", meta = (DisplayName = "[INTERNAL] Enable Development Environment"))
@@ -53,7 +61,7 @@ public:
 
 	//Should the overlay UI show the user's balance?
 	UPROPERTY(config, EditAnywhere, Category = "UI Overlay")
-	bool ShowBalance = true;
+	bool ShowBalance = false;
 
 	//The blockchain used in the overlay UI to show the user's balance.
 	UPROPERTY(config, NoClear, EditAnywhere, Category = "UI Overlay", meta = (EditCondition = "ShowBalance", DisplayName = "Blockchain used in UI for balance"))

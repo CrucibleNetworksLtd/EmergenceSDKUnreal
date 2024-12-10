@@ -31,7 +31,7 @@ void UGetFuturepassInventoryByCollectionAndOwner::Activate() {
 	}
 
 
-	FString Content = R"({"query":"query Asset($addresses: [ChainAddress!]!, $first: Float, $collectionIds: [CollectionId!]) {\r\n  assets(addresses: $addresses, first: $first, collectionIds: $collectionIds) {\r\n    edges {\r\n      node {\r\n        metadata {\r\n          properties\r\n          attributes\r\n        }\r\n        collection {\r\n          chainId\r\n          chainType\r\n          location\r\n          name\r\n        }\r\ntokenId\r\ncollectionId      }\r\n    }\r\n  }\r\n}","variables":{"addresses":[)" + AddressString + R"(], "first": 1000, "collectionIds":[)" + CollectionString + R"(] }})";
+	FString Content = R"({"query":"query Asset($addresses: [ChainAddress!]!, $first: Float, $collectionIds: [CollectionId!]) {\r\n  assets(addresses: $addresses, first: $first, collectionIds: $collectionIds) {\r\n    edges {\r\n      node {\r\n        metadata {\r\n          properties\r\n          attributes\r\n        rawAttributes\r\n}\r\n        collection {\r\n          chainId\r\n          chainType\r\n          location\r\n          name\r\n        }\r\ntokenId\r\ncollectionId      }\r\n    }\r\n  }\r\n}","variables":{"addresses":[)" + AddressString + R"(], "first": 1000, "collectionIds":[)" + CollectionString + R"(] }})";
 	Request = UHttpHelperLibrary::ExecuteHttpRequest<UGetFuturepassInventoryByCollectionAndOwner>(
 		this,
 		nullptr,
