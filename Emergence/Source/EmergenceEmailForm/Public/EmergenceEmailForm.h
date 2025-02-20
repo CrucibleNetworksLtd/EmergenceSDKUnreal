@@ -7,6 +7,9 @@
 #include "Brushes/SlateImageBrush.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
+#include "Styling/SlateTypes.h"
+#include "Input/Reply.h"
+#include "Components/EditableTextBox.h"
 
 class FToolBarBuilder;
 class FMenuBuilder;

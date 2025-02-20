@@ -2,9 +2,8 @@
 
 #pragma once
 #include "Engine/EngineTypes.h"
-#include "Environment.h"
-#include "EmergenceChainObject.h"
-#include "UI/EmergenceUI.h"
+#include "Types/Environment.h"
+#include "Types/EmergenceChain.h"
 #include "EmergencePluginSettings.generated.h"
 
 UCLASS(config = Game, defaultconfig)
@@ -22,10 +21,6 @@ public:
 	//Which cloud environment should be communicated with when the game is built as "Shipping". Default is "Production".
 	UPROPERTY(config, EditAnywhere, Category = "General", meta = (EditCondition = "!EnableDevelopmentEnvironment", DisplayName = "Shipping build cloud environment"))
 	EEmergenceEnvironment ShippingEnvironment = EEmergenceEnvironment::Production;
-
-	//Which type of login should the overlay use. Default is "WalletConnect".
-	UPROPERTY(config, EditAnywhere, Category = "General", meta = (DisplayName = "Overlay Login Type"))
-	EmergenceLoginType ProjectLoginType = EmergenceLoginType::WalletConnect;
 
 	//Which Futureverse cloud environment should be communicated with when the game is built as "Debug", "Development" or "Test". Default is "Staging".
 	UPROPERTY(config, EditAnywhere, Category = "Futureverse", meta = (DisplayName = "Debug/Development/Test build Futureverse cloud environment"))
@@ -47,47 +42,13 @@ public:
 	UPROPERTY(AdvancedDisplay, config, EditAnywhere, Category = "General", meta = (DisplayName = "[INTERNAL] Enable Development Environment"))
 	bool EnableDevelopmentEnvironment = false;
 
-	//For Crucible use only! Used to set the location of a custom version of the EVM server. Leave blank for the default.
-	UPROPERTY(AdvancedDisplay, config, EditAnywhere, Category = "General", meta = (DisplayName = "[INTERNAL] Custom Emergence Server Location", FilePathFilter = "Emergence Server (EmergenceEVMLocalServer.exe)|EmergenceEVMLocalServer.exe"))
-	FFilePath CustomEmergenceServerLocation;
-	
-	//The avatar icon to display if a persona doesn't have an avatar associated to it. You may want to alter this if you don't want to use the default Unreal Editor mannequin to represent players without their own avatar, such as one that better contextually fits with your game.
-	UPROPERTY(config, EditAnywhere, Category = "General")
-	TSoftObjectPtr<UTexture2D> DefaultAvatarIcon = TSoftObjectPtr<UTexture2D>(FSoftObjectPath("Texture2D'/Emergence/Components/UE.UE'"));
-	
-	//Used to only show pre-defined collections in the inventory screen. They should be in the fomat "BLOCKCHAIN:0xaddress", such as "POLYGON:0x074534df6174759a5ae3ad81e3bcdfc0f940f6a6" (note the lower case on the address). Setting this to empty (0 elements) will turn off the whitelist.
-	UPROPERTY(config, EditAnywhere, Category = "General")
-	TArray<FString> InventoryScreenCollectionWhitelist = {};
-
-	//Should the overlay UI show the user's balance?
-	UPROPERTY(config, EditAnywhere, Category = "UI Overlay")
-	bool ShowBalance = false;
-
-	//The blockchain used in the overlay UI to show the user's balance.
-	UPROPERTY(config, NoClear, EditAnywhere, Category = "UI Overlay", meta = (EditCondition = "ShowBalance", DisplayName = "Blockchain used in UI for balance"))
-	TSoftObjectPtr<UEmergenceChain> Chain = Cast<UEmergenceChain>(StaticLoadObject(UEmergenceChain::StaticClass(), this, TEXT("/Emergence/Chains/Polygon.Polygon")));
-
-	//Should an ERC20 be used as the balance in the UI rather than the blockchain's currency? If you use this, you must supply the blockchain the ERC20 contact is on in the "Blockchain used in UI for balance" field.
-	UPROPERTY(config, EditAnywhere, Category = "UI Overlay", meta = (EditCondition = "ShowBalance", DisplayName = "Use ERC20 As Balance"))
-	bool UseERC20AsBalance = false;
-
-	//The address of the ERC20. If you use this, you must supply the blockchain the ERC20 contact is on in the "Blockchain used in UI for balance" field.
-	UPROPERTY(config, EditAnywhere, Category = "UI Overlay", meta = (EditCondition = "UseERC20AsBalance && ShowBalance"))
-	FString ERC20Address = "";
-
 	//The IPFS node to use when getting IPFS data via HTTP. Leaving it blank will use the default "http://ipfs.openmeta.xyz/ipfs/". The IPFS hash will be added to the end (for example, using the default: "http://ipfs.openmeta.xyz/ipfs/Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu")
 	UPROPERTY(config, EditAnywhere, Category = "IPFS", meta = (DisplayName = "Custom IPFS Node"))
 	FString IPFSNode;
-	
-	//For Crucible use only! Shows the EVM server output window.
-	UPROPERTY(AdvancedDisplay, config, EditAnywhere, Category = "General", meta = (DisplayName = "[INTERNAL] Launch EVM server hidden"))
-	bool LaunchServerHidden = true;
-
 
 	//If false, libcurl will be prevented from reusing connections. This can speed up requests on some systems. If you toggle this, you may have to restart the editor for it to fully have an effect.
 	UPROPERTY(config, EditAnywhere, Category = "libCurl", meta = (DisplayName = "Allow LibCurl Connection Reuse", EditCondition = "EngineHasConnectionReuseConfig", EditConditionHides, HideEditConditionToggle))
 	bool AllowLibcurlConnectionReuse = false;
-
 
 	UPROPERTY()
 	bool EngineHasConnectionReuseConfig = true;

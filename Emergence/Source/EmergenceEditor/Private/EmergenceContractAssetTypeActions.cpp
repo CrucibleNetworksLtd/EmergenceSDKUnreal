@@ -1,7 +1,7 @@
 // Copyright Crucible Networks Ltd 2023. All Rights Reserved.
 
 #include "EmergenceContractAssetTypeActions.h"
-#include "EmergenceContract.h"
+#include "Types/EmergenceContract.h"
 #include "Slate/SlateGameResources.h"
 #include "Interfaces/IPluginManager.h"
 

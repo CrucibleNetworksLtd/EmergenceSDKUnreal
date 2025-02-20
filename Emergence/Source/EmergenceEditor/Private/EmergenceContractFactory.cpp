@@ -2,7 +2,7 @@
 
 
 #include "EmergenceContractFactory.h"
-#include "EmergenceContract.h"
+#include "Types/EmergenceContract.h"
 
 UEmergenceContractFactory::UEmergenceContractFactory() {
     SupportedClass = UEmergenceContract::StaticClass();

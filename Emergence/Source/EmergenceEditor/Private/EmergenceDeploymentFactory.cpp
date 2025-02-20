@@ -2,7 +2,7 @@
 
 
 #include "EmergenceDeploymentFactory.h"
-#include "EmergenceDeployment.h"
+#include "Types/EmergenceDeployment.h"
 
 UEmergenceDeploymentFactory::UEmergenceDeploymentFactory() {
     SupportedClass = UEmergenceDeployment::StaticClass();

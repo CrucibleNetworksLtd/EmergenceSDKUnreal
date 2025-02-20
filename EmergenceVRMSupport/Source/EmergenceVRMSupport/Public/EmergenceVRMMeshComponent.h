@@ -41,9 +41,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ActivateVRMMeshFromData(const TArray<uint8>& Data, const EEmergenceVRMImportMaterialType MaterialType = EEmergenceVRMImportMaterialType::VRMIMT_MToonUnlit, UMaterial* MaterialOverride = nullptr);
 	
-	UFUNCTION(BlueprintPure)
-	static const EEmergenceVRMImportMaterialType MaterialTypeFromString(const FString MaterialString);
-	
 	UFUNCTION()
 	void VRMLoadCompleted(int Linkage);
 

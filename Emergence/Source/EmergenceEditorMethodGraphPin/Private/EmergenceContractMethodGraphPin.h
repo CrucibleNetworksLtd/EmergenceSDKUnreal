@@ -7,8 +7,8 @@
 #include "SlateBasics.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/SWidget.h"
-#include "EmergenceContract.h"
-#include "EmergenceDeployment.h"
+#include "Types/EmergenceContract.h"
+#include "Types/EmergenceDeployment.h"
 
 class SNameComboBox;
 

@@ -7,7 +7,8 @@ public class EmergenceEditor : ModuleRules
 	public EmergenceEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
+		bEnforceIWYU = true;
+		
         PrivateDependencyModuleNames.AddRange(
 			new string[] {
                 "Core",
@@ -24,7 +25,7 @@ public class EmergenceEditor : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(
 		new string[] { 
-			"Emergence" 
+			"EmergenceCore" 
 			}
 		);
 	}
