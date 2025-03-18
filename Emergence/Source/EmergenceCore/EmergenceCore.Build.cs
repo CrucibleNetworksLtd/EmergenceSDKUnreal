@@ -10,7 +10,6 @@ public class EmergenceCore : ModuleRules
 		
 		bEnforceIWYU = true;
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		CppStandard = CppStandardVersion.Cpp17;
 		
 		PublicDependencyModuleNames.AddRange(
 			new string[]

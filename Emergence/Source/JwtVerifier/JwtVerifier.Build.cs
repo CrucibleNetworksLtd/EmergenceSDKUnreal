@@ -8,7 +8,6 @@ public class JwtVerifier : ModuleRules
 	public JwtVerifier(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-        CppStandard = CppStandardVersion.Cpp17;
 
         PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
         PublicIncludePaths.AddRange(
@@ -17,14 +16,6 @@ public class JwtVerifier : ModuleRules
 				Path.Combine(Path.Combine(ModuleDirectory, "Public"))
             }
             );
-
-
-        PrivateIncludePaths.AddRange(
-			new string[] {
-				// ... add other private include paths required here ...
-				
-			}
-			);
 			
 		
 		PublicDependencyModuleNames.AddRange(
@@ -32,8 +23,6 @@ public class JwtVerifier : ModuleRules
 			{
 				"Core",
 				"JwtCpp"
-				
-				// ... add other public dependencies that you statically link with here ...
 			}
 			);
 			
@@ -47,13 +36,6 @@ public class JwtVerifier : ModuleRules
 			}
 			);
 		
-		
-		DynamicallyLoadedModuleNames.AddRange(
-			new string[]
-			{
-				// ... add any modules that your module loads dynamically here ...
-			}
-			);
 		bEnableExceptions = true;
 	}
 }

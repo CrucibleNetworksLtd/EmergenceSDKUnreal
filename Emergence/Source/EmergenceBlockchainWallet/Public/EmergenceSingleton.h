@@ -94,7 +94,7 @@ public:
 
 	//Kills the walletconnect session. Setting TrackRequest to false will mean OnSessionEnded will never fire,
 	//and this request won't be added to ActiveRequests (good to prevent this getting premptively killed going from PIE back to Editor.
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Emergence|Emergence Singleton|WalletConnect Methods")
 	void KillWalletConnectSession(bool TrackRequest = true);
 
 
