@@ -2,7 +2,7 @@
 
 
 #include "EmergenceChainFactory.h"
-#include "EmergenceChainObject.h"
+#include "Types/EmergenceChain.h"
 
 UEmergenceChainFactory::UEmergenceChainFactory() {
     SupportedClass = UEmergenceChain::StaticClass();

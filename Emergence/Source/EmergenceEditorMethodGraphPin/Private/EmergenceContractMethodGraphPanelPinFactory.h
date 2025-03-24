@@ -3,7 +3,7 @@
 #pragma once
 
 #include "EdGraphUtilities.h"
-#include "EmergenceContract.h"
+#include "Types/EmergenceContract.h"
 #include "EmergenceContractMethodGraphPin.h"
 
 class FEmergenceContractMethodGraphPanelPinFactory: public FGraphPanelPinFactory
@@ -14,20 +14,7 @@ class FEmergenceContractMethodGraphPanelPinFactory: public FGraphPanelPinFactory
 		if (InPin->PinType.PinCategory == K2Schema->PC_Struct && InPin->PinType.PinSubCategoryObject == FEmergenceContractMethod::StaticStruct())
 		{
 			return SNew(SEmergenceContractMethodGraphPin, InPin);
-			//return nullptr;
 		}
-		/*if (InPin->PinType.PinCategory == K2Schema->PC_Struct && InPin->PinType.PinSubCategoryObject == FGameplayTagContainer::StaticStruct())
-		{
-			return SNew(SGameplayTagContainerGraphPin, InPin);
-		}
-		if (InPin->PinType.PinCategory == K2Schema->PC_String && InPin->PinType.PinSubCategory == TEXT("LiteralGameplayTagContainer"))
-		{
-			return SNew(SGameplayTagContainerGraphPin, InPin);
-		}
-		if (InPin->PinType.PinCategory == K2Schema->PC_Struct && InPin->PinType.PinSubCategoryObject == FGameplayTagQuery::StaticStruct())
-		{
-			return SNew(SGameplayTagQueryGraphPin, InPin);
-		}*/
 
 		return nullptr;
 	}

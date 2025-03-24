@@ -26,6 +26,12 @@
 #include "HttpService/HttpHelperLibrary.h"
 #include "Serialization/JsonWriter.h"
 #include "Interfaces/IHttpResponse.h"
+#include "Widgets/Images/SImage.h"
+#include "Widgets/Layout/SSpacer.h"
+#include "Widgets/Input/SCheckBox.h"
+#include "Widgets/Input/SEditableTextBox.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Serialization/JsonSerializer.h"
 
 static const FName EmergenceEmailFormTabName("Emergence Email Form");
 static const TCHAR* ShowAgainConfigName = TEXT("ShowEmailBox");
@@ -244,11 +250,7 @@ void FEmergenceEmailFormModule::SendEmail(FString email)
 	TemplateParams->SetStringField("from_email", email);
 	TemplateParams->SetStringField("from_engine", FGenericPlatformHttp::EscapeUserAgentString(FApp::GetBuildVersion()));
 	TemplateParams->SetStringField("from_emergenceversion", FGenericPlatformHttp::EscapeUserAgentString(UHttpHelperLibrary::GetEmergenceVersionNumber()));
-#if UNREAL_MARKETPLACE_BUILD
 	TemplateParams->SetStringField("from_emergenceevmtype", "EVMOnline");
-#else
-	TemplateParams->SetStringField("from_emergenceevmtype", "LocalEVM");
-#endif
 	TemplateParams->SetStringField("from_os", FGenericPlatformHttp::EscapeUserAgentString(FString(FPlatformProperties::IniPlatformName()) + " " + FPlatformMisc::GetOSVersion()));
 
 	TSharedPtr<FJsonObject> SendEmailContent = MakeShareable(new FJsonObject);
@@ -286,28 +288,16 @@ void FEmergenceEmailFormModule::RegisterMenus()
 	// Owner will be used for cleanup in call to UToolMenus::UnregisterOwner
 	FToolMenuOwnerScoped OwnerScoped(this);
 
+	UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Help");
 	{
-		UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Help");
-		{
-			FToolMenuSection& Section = Menu->FindOrAddSection("Emergence");
-			Section.AddMenuEntryWithCommandList(FEmergenceEmailFormCommands::Get().OpenPluginWindow, PluginCommands, FText::FromString("Emergence Email Form"));
-		}
+		FToolMenuSection& Section = Menu->FindOrAddSection("Emergence");
+		Section.AddMenuEntryWithCommandList(FEmergenceEmailFormCommands::Get().OpenPluginWindow, PluginCommands, FText::FromString("Emergence Email Form"));
 	}
 
-	{
-		/*UToolMenu* ToolbarMenu = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar");
-		{
-			FToolMenuSection& Section = ToolbarMenu->FindOrAddSection("Settings");
-			{
-				FToolMenuEntry& Entry = Section.AddEntry(FToolMenuEntry::InitToolBarButton(FEmergenceEmailFormCommands::Get().OpenPluginWindow));
-				Entry.SetCommandList(PluginCommands);
-			}
-		}*/
-	}
 	FModuleManager::GetModuleChecked<FLevelEditorModule>(FName("LevelEditor")).OnRegisterTabs().AddLambda([&](TSharedPtr<FTabManager> TabManager)
-		{
-			ActivateFormChecked(false);
-		});
+	{
+		ActivateFormChecked(false);
+	});
 }
 
 #undef LOCTEXT_NAMESPACE

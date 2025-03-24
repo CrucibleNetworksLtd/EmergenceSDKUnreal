@@ -9,6 +9,7 @@
 #include "LoaderBPFunctionLibrary.h"
 #include "Engine/LatentActionManager.h"
 #include "Animation/Skeleton.h"
+#include "Materials/Material.h"
 
 UEmergenceVRMMeshComponent::UEmergenceVRMMeshComponent()
 {
@@ -48,10 +49,10 @@ void UEmergenceVRMMeshComponent::ActivateVRMMeshFromData(const TArray<uint8>& Da
 	else {
 		if (MaterialType == EEmergenceVRMImportMaterialType::VRMIMT_EmergenceMToonUnlit && MaterialOverride) {
 			VrmImportMaterialSet = NewObject<UVrmImportMaterialSet>();
-			VrmImportMaterialSet->Opaque = MaterialOverride;
-			VrmImportMaterialSet->OpaqueTwoSided = MaterialOverride;
-			VrmImportMaterialSet->Translucent = MaterialOverride;
-			VrmImportMaterialSet->TranslucentTwoSided = MaterialOverride;
+			VrmImportMaterialSet->Opaque = Cast<UMaterialInterface>(MaterialOverride);
+			VrmImportMaterialSet->OpaqueTwoSided = Cast<UMaterialInterface>(MaterialOverride);
+			VrmImportMaterialSet->Translucent = Cast<UMaterialInterface>(MaterialOverride);
+			VrmImportMaterialSet->TranslucentTwoSided = Cast<UMaterialInterface>(MaterialOverride);
 			VrmAssetListObject->MtoonUnlitSet = VrmImportMaterialSet;
 			OptionForRuntimeLoad.MaterialType = EVRMImportMaterialType::VRMIMT_MToonUnlit;
 		}
@@ -64,47 +65,6 @@ void UEmergenceVRMMeshComponent::ActivateVRMMeshFromData(const TArray<uint8>& Da
 	else {
 		UE_LOG(LogAnimation, Error, TEXT("Tried to start loading a VRM while there is a VRM load in progress."));
 	}
-}
-
-const EEmergenceVRMImportMaterialType UEmergenceVRMMeshComponent::MaterialTypeFromString(const FString MaterialString)
-{
-	FString SanitizedMaterialString = MaterialString.ToLower();
-
-	//MToonUnlit
-	if (MaterialString == "mtoonunlit") {
-		return EEmergenceVRMImportMaterialType::VRMIMT_MToonUnlit;
-	}
-
-	//MToonLit
-	if (MaterialString == "mtoonlit") {
-		return EEmergenceVRMImportMaterialType::VRMIMT_MToon;
-	}
-
-	//PBR
-	if (MaterialString == "pbr") {
-		return EEmergenceVRMImportMaterialType::VRMIMT_glTF;
-	}
-
-	//Subsurface
-	if (MaterialString == "subsurface") {
-		return EEmergenceVRMImportMaterialType::VRMIMT_SSS;
-	}
-
-	//Subsurface Profile
-	if (MaterialString == "subsurfaceprofile") {
-		return EEmergenceVRMImportMaterialType::VRMIMT_SSSProfile;
-	}
-
-	//Unlit
-	if (MaterialString == "unlit") {
-		return EEmergenceVRMImportMaterialType::VRMIMT_Unlit;
-	}
-
-	if (MaterialString == "emergencemtoonunlit") {
-		return EEmergenceVRMImportMaterialType::VRMIMT_EmergenceMToonUnlit;
-	}
-
-	return EEmergenceVRMImportMaterialType::VRMIMT_MToonUnlit;
 }
 
 void UEmergenceVRMMeshComponent::VRMLoadCompleted(int Linkage)

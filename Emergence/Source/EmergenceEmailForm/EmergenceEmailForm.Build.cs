@@ -6,8 +6,9 @@ public class EmergenceEmailForm : ModuleRules
 {
 	public EmergenceEmailForm(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;	
-		CppStandard = CppStandardVersion.Cpp17;
+		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		bEnforceIWYU = true;
+		
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -31,7 +32,7 @@ public class EmergenceEmailForm : ModuleRules
 				"HTTP",
 				"Json",
 				"JsonUtilities",
-				"Emergence"
+				"EmergenceCore"
 			}
 			);
 	}

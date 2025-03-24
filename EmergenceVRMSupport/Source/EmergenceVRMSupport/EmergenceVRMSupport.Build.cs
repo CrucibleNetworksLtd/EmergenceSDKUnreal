@@ -8,6 +8,7 @@ public class EmergenceVRMSupport : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		CppStandard = CppStandardVersion.Cpp17;	
+		bEnforceIWYU = true;
 		
 		PublicDependencyModuleNames.AddRange(
 			new string[] {

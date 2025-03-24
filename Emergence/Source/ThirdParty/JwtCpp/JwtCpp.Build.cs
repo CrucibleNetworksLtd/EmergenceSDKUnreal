@@ -8,7 +8,6 @@ public class JwtCpp : ModuleRules
 	public JwtCpp(ReadOnlyTargetRules Target) : base(Target)
 	{
         Type = ModuleType.External;
-        CppStandard = CppStandardVersion.Cpp17;
         PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "include"));
         PublicIncludePaths.AddRange(
 			new string[] {
