@@ -1,2 +1,2 @@
-# Emergence Unreal SDK
-The Emergence Unreal Plugin is a Web3 SDK for game developers. You can find the releases in the [downloads section](https://github.com/CrucibleNetworksLtd/EmergenceSDKUnreal/releases/) and the [documentation on our website](https://docs.openmetadao.com/). You can also find a sample project .zip with the latest release in the [downloads section](https://github.com/CrucibleNetworksLtd/EmergenceSDKUnreal/releases/) as well as a prebuilt version of the plugins (**You will need this if you wish to run Emergence in a Blueprint-only project.**).
+# This is the old Unreal plugin repo, the new one can be found [here](https://github.com/CrucibleNetworksLtd/emergence-plugin-unreal).
+This is preserved here as an archive of older versions of the plugin.
